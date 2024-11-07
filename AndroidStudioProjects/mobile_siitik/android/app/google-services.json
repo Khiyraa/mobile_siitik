@@ -1,0 +1,83 @@
+{
+  "project_info": {
+    "project_number": "272944052495",
+    "firebase_url": "https://si-itik-7b3e6-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "si-itik-7b3e6",
+    "storage_bucket": "si-itik-7b3e6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:272944052495:android:6aea813a553ea7160ca67a",
+        "android_client_info": {
+          "package_name": "com.polije.mbkmsiitik"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "272944052495-qlg2bf0mea75i1jds61j54u5i8nepg6l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBifKc4O7oZu086z3kK_UQyFaoyinKykSA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "272944052495-qlg2bf0mea75i1jds61j54u5i8nepg6l.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "272944052495-6a753049pikct4oilmefuhksaoouhbo8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.polije.mbkmsiitk.mobileSiitik"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:272944052495:android:aa2dedf93f3e7e540ca67a",
+        "android_client_info": {
+          "package_name": "com.polije.mbkmsiitk.mobile_siitik"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "272944052495-qlg2bf0mea75i1jds61j54u5i8nepg6l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBifKc4O7oZu086z3kK_UQyFaoyinKykSA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "272944052495-qlg2bf0mea75i1jds61j54u5i8nepg6l.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "272944052495-6a753049pikct4oilmefuhksaoouhbo8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.polije.mbkmsiitk.mobileSiitik"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

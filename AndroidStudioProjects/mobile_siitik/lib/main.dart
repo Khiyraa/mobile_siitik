@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'core/configs/theme.dart';
+import 'package:mobile_siitik/screens/dashboard_screen.dart';
+// import 'core/configs/theme.dart';
 import 'screens/auth/login_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+
+// import 'screens/dashboard_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,14 +15,18 @@ void main() async {
   }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'SI-ITIK',
-      theme: AppTheme.lightTheme,
-      home: const LoginScreen(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const LoginScreen(),  // Route ke LoginScreen
+        '/home': (context) => const DashboardScreen(),  // Pastikan dashboard_screen.dart terdaftar di sini
+        // '/forgot-password': (context) => const ForgotPasswordScreen(),
+      },
     );
   }
 }

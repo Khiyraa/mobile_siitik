@@ -1,4 +1,3 @@
-// services/auth_service.dart
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -63,30 +62,38 @@ class AuthService {
   // Sign in dengan Google
   Future<UserCredential?> signInWithGoogle() async {
     try {
+      print('1. Memulai proses Google Sign In');
       // Trigger the authentication flow
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
       if (googleUser == null) {
+        print('2. User membatalkan Google Sign In');
         throw FirebaseAuthException(
-          code: 'google-sign-in-canceled',
-          message: 'Google sign in dibatalkan oleh pengguna.',
+          code: 'user-cancelled',
+          message: 'User membatalkan proses login Google',
         );
       }
 
+      print('3. Berhasil mendapatkan akun Google: ${googleUser.email}');
+
       // Obtain the auth details from the request
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      print('4. Berhasil mendapatkan authentication');
 
       // Create a new credential
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
+      print('5. Berhasil membuat credential');
 
       // Sign in to Firebase with the Google credential
       final userCredential = await _auth.signInWithCredential(credential);
+      print('6. Berhasil sign in ke Firebase dengan Google');
+
       return userCredential;
     } catch (e) {
-      print('Error signing in with Google: $e');
+      print('Error dalam signInWithGoogle: $e');
       rethrow;
     }
   }

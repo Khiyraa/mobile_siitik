@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageInfo>
+  <Download>
+    <Package type="driver_rqueue" arch="x86" os_major="10" os_minor="all">ftp://ftp.hp.com/pub/softlib/software13/printers/SUPD/SUPD-POG-Drivers-x86-4_06_1_3173-WHQL.zip</Package>
+    <Package type="driver_rqueue" arch="x64" os_major="10" os_minor="all">ftp://ftp.hp.com/pub/softlib/software13/printers/SUPD/SUPD-POG-Drivers-x64-4_06_1_3173-WHQL.zip</Package>
+    <Package type="DXP" os_major="10" os_minor="all">ftp://ftp.hp.com/pub/softlib/software13/printers/SUPD/SUPD-POG-DXP.zip</Package>
+  </Download>
+  <DriverInfo type="Rqueue">
+    <Version>4.06.1.3173</Version>
+    <INF arch="x86">HPOneDriver_SPD_V4_x86.inf</INF>
+    <INF arch="x64">HPOneDriver_SPD_V4_x64.inf</INF>
+    <Name>HP Smart Printing</Name>
+    <QUEUE>HP Smart Printing</QUEUE>
+    <PORT>HPSmartPrintingPort</PORT>
+  </DriverInfo>
+  <DriverInfo type="Nqueue">
+    <Version></Version>
+    <INF></INF>
+    <Name></Name>
+  </DriverInfo>
+</PackageInfo>

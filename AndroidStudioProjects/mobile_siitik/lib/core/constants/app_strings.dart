@@ -13,4 +13,8 @@ class AppStrings {
   static const String loginSubtitle = 'solusi modern yang dirancang khusus untuk\nmengelola ternak itik anda';
   static const String confirmPassword = 'Konfirmasi Password';
   static const String name = 'Nama Lengkap';
+  static const String currentDucks = 'Jumlah Itik Saat Ini';
+  static const String eggProduction = 'Produksi Telur';
+  static const String male = 'Jantan';
+  static const String female = 'Betina';
 }

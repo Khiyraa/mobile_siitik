@@ -1,0 +1,12 @@
+{
+	"pluginLocation": "https://ftp.hp.com/pub/softlib/software13/printers/PerfectPrint/HPNativeHost_Release_1.3.0.6.zip",
+	"pluginVersion": "1.3.0.4",
+	"updatePlugin": true,
+	"forceUninstallPlugin": false,
+	"installLocation": "C:\\Program Files\\HP\\NativeHost",
+	"mainExeFileName": "HPCOPPHOST.exe",
+	"WebRegKeyPath": "HKEY_CURRENT_USER\\Software\\Google\\Chrome\\NativeMessagingHosts\\com.hp.htmltopdf",
+	"WebRegKeyValue": "C:\\Program Files\\HP\\NativeHost\\SupportedFiles\\com.hp.htmltopdf.json",
+	"ExcRegKeyPath": "HKEY_CURRENT_USER\\Software\\Classes\\native-host-server\\shell\\open\\command",
+	"ExcRegKeyValue": "C:\\Program Files\\HP\\NativeHost\\HPCOPPHOST.exe %1"
+}

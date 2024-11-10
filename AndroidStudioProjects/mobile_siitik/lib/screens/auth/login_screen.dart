@@ -24,14 +24,16 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   bool _obscurePassword = true;
 
+
+
   void _showRegisterDialog() {
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
-    final usernameController = TextEditingController();
+    // final emailController = TextEditingController();
+    // final passwordController = TextEditingController();
+    // final usernameController = TextEditingController();
 
     showDialog(
-      context: context,
-      builder: (context) => const RegisterDialog()
+        context: context,
+        builder: (context) => const RegisterDialog()
     );
   }
 
@@ -44,54 +46,136 @@ class _LoginScreenState extends State<LoginScreen> {
       final email = _emailController.text;
       final password = _passwordController.text;
 
+      try {
+        final userCredential = await _authService.signInWithEmailAndPassword(email, password);
+        if (userCredential != null) {
+          // Navigasi ke halaman dashboard setelah login berhasil
+          Navigator.pushReplacementNamed(context, '/home');  // '/home' akan membuka DashboardScreen
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Login berhasil!'),
+            ),
+          );
+        } else {
+          // Akun tidak ditemukan
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Akun tidak ditemukan.'),
+            ),
+          );
+        }
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'user-not-found') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Akun tidak ditemukan.'),
+            ),
+          );
+        } else if (e.code == 'wrong-password') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Kata sandi salah.'),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Terjadi kesalahan: ${e.message}'),
+            ),
+          );
+        }
 
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+  Future<void> _handleGoogleSignIn() async {
     try {
-    final userCredential = await _authService.signInWithEmailAndPassword(email, password);
-    if (userCredential != null) {
-    // Navigasi ke halaman utama atau tampilkan pesan sukses
-    Navigator.pushReplacementNamed(context, '/home'); // Ganti '/home' dengan nama route halaman utama Anda
-    ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-    content: Text('Login berhasil!'),
-    ),
-    );
-    } else {
-    // Akun tidak ditemukan
-    ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-    content: Text('Akun tidak ditemukan.'),
-    ),
-    );
-    }
-    } on FirebaseAuthException catch (e) {
-    if (e.code == 'user-not-found') {
-    ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-    content:
-    Text('Akun tidak ditemukan.'),
-    ),
-    );
-    } else if (e.code == 'wrong-password') {
-    ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-    content: Text('Kata sandi salah.'),
-    ),
-    );
-    } else {
-    // Handle kesalahan lainnya
-    ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-    content: Text('Terjadi kesalahan: ${e.message}'),
-    ),
-    );
-    }
+      setState(() {
+        _isLoading = true;
+      });
+
+      print('Memulai proses login Google di LoginScreen');
+
+      // Logging sebelum mencoba login
+      print('Memulai signInWithGoogle...');
+      final userCredential = await _authService.signInWithGoogle();
+
+      // Logging setelah userCredential diperoleh
+      if (userCredential != null && userCredential.user != null) {
+        print('Login berhasil: ${userCredential.user!.email}');
+
+        if (!mounted) return;
+        Navigator.pushReplacementNamed(context, '/dashboard');
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Login berhasil!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        print('UserCredential kosong atau user null');
+      }
+    } catch (e) {
+      print('Error detail dalam handleGoogleSignIn: $e');
+
+      // Logging tambahan untuk tipe error
+      if (e is FirebaseAuthException) {
+        print('Firebase Auth Error Code: ${e.code}');
+        print('Firebase Auth Error Message: ${e.message}');
+      } else {
+        print('Error bukan dari FirebaseAuthException: ${e.runtimeType}');
+      }
+
+      String errorMessage = 'Gagal login dengan Google';
+
+      if (e is FirebaseAuthException) {
+        switch (e.code) {
+          case 'user-cancelled':
+            errorMessage = 'Login dibatalkan';
+            break;
+          case 'account-exists-with-different-credential':
+            errorMessage = 'Akun sudah terdaftar dengan metode login yang berbeda';
+            break;
+          case 'invalid-credential':
+            errorMessage = 'Kredensial tidak valid';
+            break;
+          case 'operation-not-allowed':
+            errorMessage = 'Login dengan Google tidak diaktifkan';
+            break;
+          case 'user-disabled':
+            errorMessage = 'Akun telah dinonaktifkan';
+            break;
+          case 'user-not-found':
+            errorMessage = 'Akun tidak ditemukan';
+            break;
+          default:
+            errorMessage = e.message ?? 'Terjadi kesalahan saat login dengan Google';
+        }
+      }
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.red,
+        ),
+      );
     } finally {
-    setState(() {
-    _isLoading = false;
-    });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      // Logging setelah proses selesai, baik berhasil atau gagal
+      print('Proses login selesai');
     }
   }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       Image.asset(
                         AppImages.logo,
-                        height: 250,  // Sesuaikan dengan ukuran yang diinginkan
+                        height: 200,  // Sesuaikan dengan ukuran yang diinginkan
                         fit: BoxFit.contain,
                       ),
                     ],
@@ -183,6 +267,76 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 5),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/forgot-password');
+                    },
+                    child: const Text(
+                      'Lupa Password?',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 5),
+
+                  // Divider dengan teks
+                  Row(
+                    children: [
+                      const Expanded(
+                        child: Divider(
+                          color: Colors.grey,
+                          thickness: 1,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          'Atau masuk dengan',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                      const Expanded(
+                        child: Divider(
+                          color: Colors.grey,
+                          thickness: 1,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Tombol Google Sign In
+                  InkWell(
+                    onTap: _handleGoogleSignIn,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset(
+                            'assets/images/google.png',
+                            height: 24,
+                            width: 24,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -191,6 +345,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+
 
 
   @override

@@ -51,6 +51,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "272944052495-5979iuncr0ek5a198g7pdav572qm2tk0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.polije.mbkmsiitk.mobile_siitik",
+            "certificate_hash": "249dffc19a6fb2996ed4c56d34a6de7939116c1b"
+          }
+        },
+        {
           "client_id": "272944052495-qlg2bf0mea75i1jds61j54u5i8nepg6l.apps.googleusercontent.com",
           "client_type": 3
         }

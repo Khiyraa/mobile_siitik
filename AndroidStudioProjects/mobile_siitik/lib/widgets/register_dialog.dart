@@ -4,7 +4,7 @@ import 'package:mobile_siitik/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterDialog extends StatefulWidget {
-  const RegisterDialog({Key? key}) : super(key: key);
+  const RegisterDialog({super.key});
 
   @override
   State<RegisterDialog> createState() => _RegisterDialogState();
@@ -275,7 +275,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
                       Navigator.of(context).pop();
                       // Add navigation to login screen if needed
                     },
-                    child: Text(
+                    child: const Text(
                       'Masuk Sekarang',
                       style: TextStyle(
                         color: AppColors.primary,
@@ -288,8 +288,8 @@ class _RegisterDialogState extends State<RegisterDialog> {
               const SizedBox(height: 20),
 
               // Divider
-              Row(
-                children: const [
+              const Row(
+                children: [
                   Expanded(child: Divider()),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16),

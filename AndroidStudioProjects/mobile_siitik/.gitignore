@@ -49,3 +49,41 @@ AppData/Local/
 # Contoh pattern lainnya
 node_modules/
 build/
+
+
+
+# Local configuration
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# System files
+
+Thumbs.db
+
+
+
+
+
+# Directory for yarn cache
+.yarn-cache
+
+# Local IDE files
+.idea
+.vscode
+
+# Output and log files
+npm-debug.log*
+yarn-error.log*
+
+# OS specific files
+*/.DS_Store
+*/Thumbs.db
+
+# macOS
+.localized/
+
+# Windows image files caches
+ehthumbs.db

@@ -44,3 +44,8 @@ app.*.map.json
 
 # Firebase configuration
 firebase_options.dart
+
+AppData/Local/
+# Contoh pattern lainnya
+node_modules/
+build/

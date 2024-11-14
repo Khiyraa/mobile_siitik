@@ -1,0 +1,136 @@
+[3924-11-12/ 11:34:24.025:INFO:browser_app.cc(313)] Framework Microsoft Windows 64bit
+[3924-11-12/ 11:34:24.025:INFO:browser_app.cc(317)] Version NVIDIACEFClient/73.3683.1933.5/rel_03_28/9a1bfbe
+[3924-11-12/ 11:34:24.025:INFO:browser_app.cc(696)] CreateCefWindowInstance
+[3924-11-12/ 11:34:24.031:INFO:browser_app.cc(701)] Add handler 000002B047D5E180
+[3924-11-12/ 11:34:24.032:WARNING:offscreen_window.cpp(94)] enabling gpu, using dx11
+[3924-11-12/ 11:34:24.867:INFO:utils_win.cc(179)] SetProcessDpiAwareness succeeded.
+[3924-11-12/ 11:34:24.881:INFO:offscreen_window.cpp(152)] main window is: 000000000002007C
+[3924-11-12/ 11:34:24.883:INFO:offscreen_window.cpp(160)] window size: 1920 1080
+[3924-11-12/ 11:34:24.887:INFO:offscreen_window.cpp(1112)] OnFocus: 0
+[3924-11-12/ 11:34:24.890:INFO:offscreen_window.cpp(190)] desktop window is: 0000000000020074
+[3924-11-12/ 11:34:24.891:INFO:offscreen_window.cpp(1112)] OnFocus: 0
+[3924-11-12/ 11:34:24.894:INFO:shadowplay_wrapper.cpp(206)] stream initialized to: 1920 x 1080
+[3924-11-12/ 11:34:24.905:INFO:browser_app_win.cc(243)] CreateProcess "C:\Program Files (x86)\NVIDIA Corporation\NvNode\nvnodejslauncher.exe" --launcher="NVIDIA Share"
+[3924-11-12/ 11:34:24.979:INFO:cef_plugin_win.cpp(139)] Loaded Cef Plugin  cef/common/OverClocking.dll
+[3924-11-12/ 11:34:24.981:ERROR:cef_plugin_win.cpp(49)] Failed to map module libeay32.dll. Error 2
+[3924-11-12/ 11:34:24.981:ERROR:cef_plugin_win.cpp(58)] Failed to load dependency libeay32.dll. Error 126
+[3924-11-12/ 11:34:24.981:ERROR:cef_plugin_win.cpp(49)] Failed to map module ssleay32.dll. Error 2
+[3924-11-12/ 11:34:24.981:ERROR:cef_plugin_win.cpp(58)] Failed to load dependency ssleay32.dll. Error 126
+[3924-11-12/ 11:34:25.069:ERROR:cef_plugin_win.cpp(58)] Failed to load dependency poco.dll. Error 126
+[3924-11-12/ 11:34:25.095:ERROR:cef_plugin_win.cpp(58)] Failed to load dependency PocoInitializer.dll. Error 126
+[3924-11-12/ 11:34:25.179:INFO:cef_plugin_win.cpp(139)] Loaded Cef Plugin  cef/share/MessageBusRouter.dll
+[3924-11-12/ 11:34:25.180:INFO:cef_plugin.cpp(69)] 2024-11-12T11:34:25.180[I]                     LoggingImpl.cpp:203  Initialize CrimsonNative logger
+
+[3924-11-12/ 11:34:33.925:INFO:browser_app_win.cc(265)] nvnodejslauncher 0ExitCode: 0
+[3924-11-12/ 11:34:33.926:INFO:browser_app.cc(785)] Start app event thread
+[3924-11-12/ 11:34:33.954:WARNING:offscreen_layer.cpp(680)] creating browser layer: 1
+[3924-11-12/ 11:34:35.258:INFO:query_handler_win.cc(148)] Node info request success
+[3924-11-12/ 11:34:35.281:INFO:simple_handler.cc(207)] Site load done with httpStatusCode 0
+[3924-11-12/ 11:34:36.221:INFO:shadowplay_wrapper.cpp(687)] Set m_is_experimental to 1
+[3924-11-12/ 15:28:37.839:INFO:offscreen_window.cpp(834)] should close osc from suspend
+[3924-11-12/ 15:28:37.843:INFO:offscreen_window.cpp(834)] should close osc from suspend
+[3924-11-13/ 10:24:43.955:WARNING:dns_config_service_win.cc(665)] Failed to read DnsConfig.
+[3924-11-13/ 10:24:44.120:WARNING:dns_config_service_win.cc(665)] Failed to read DnsConfig.
+[3924-11-13/ 10:24:44.573:WARNING:dns_config_service_win.cc(665)] Failed to read DnsConfig.
+[3924-11-13/ 10:24:46.682:WARNING:dns_config_service_win.cc(665)] Failed to read DnsConfig.
+[3924-11-13/ 10:24:49.061:WARNING:dns_config_service_win.cc(665)] Failed to read DnsConfig.
+[3924-11-13/ 10:24:49.152:WARNING:dns_config_service_win.cc(665)] Failed to read DnsConfig.
+[3924-11-13/ 10:24:49.509:WARNING:dns_config_service_win.cc(665)] Failed to read DnsConfig.
+[3924-11-13/ 10:24:49.584:WARNING:dns_config_service_win.cc(665)] Failed to read DnsConfig.
+[3924-11-13/ 10:24:50.457:WARNING:dns_config_service_win.cc(665)] Failed to read DnsConfig.
+[3924-11-13/ 10:24:50.751:INFO:offscreen_window.cpp(1177)] display change: 0 0 1360 768
+[3924-11-13/ 10:24:50.994:INFO:offscreen_window.cpp(1177)] display change: 0 0 1360 768
+[3924-11-13/ 10:24:51.063:INFO:offscreen_window.cpp(1177)] display change: 0 0 1360 768
+[3924-11-13/ 10:24:52.476:INFO:shadowplay_wrapper.cpp(159)] Resizing stream..
+[3924-11-13/ 10:24:52.493:INFO:shadowplay_wrapper.cpp(206)] stream initialized to: 1360 x 768
+[3924-11-13/ 10:24:52.569:INFO:offscreen_window.cpp(1057)] setting zoom to: -1.89139
+[3924-11-13/ 10:24:52.609:INFO:offscreen_window.cpp(1177)] display change: 0 0 1360 768
+[3924-11-13/ 10:24:56.088:INFO:browser_app_win.cc(155)] Force shutdown event
+[3924-11-13/ 10:24:56.088:INFO:simple_handler.cc(266)] Post TryCloseAllBrowsers
+[3924-11-13/ 10:24:56.088:INFO:simple_handler.cc(271)] TryCloseAllBrowsers
+[3924-11-13/ 10:24:56.185:INFO:simple_handler.cc(111)] DoClose 000002B047D5E180
+[3924-11-13/ 10:24:56.186:INFO:simple_handler.cc(283)] CloseAllBrowsers
+[3924-11-13/ 10:24:56.186:INFO:browser_app.cc(914)] Removed handler 000002B047D5E180
+[3924-11-13/ 10:24:56.186:INFO:browser_app.cc(953)] QuitAppMessageLoop
+[3924-11-13/ 10:24:56.341:INFO:browser_app.cc(900)] Shutdown app event thread
+[3924-11-13/ 10:24:56.342:INFO:cef_plugin_manager.cpp(139)] Wait for all plugins to stop
+[3924-11-13/ 10:24:56.348:INFO:cef_plugin_manager.cpp(147)] Stop complete
+[3924-11-13/ 10:24:56.410:INFO:browser_app.cc(978)] Browser app shutting down
+[3924-11-13/ 10:24:56.410:INFO:cefmain_win.cc(402)] CefShutdown
+[3924-11-13/ 10:24:57.274:INFO:cefmain_win.cc(404)] CefShutdown Done
+[3924-11-13/ 10:24:59.980:INFO:browser_app.cc(313)] Framework Microsoft Windows 64bit
+[3924-11-13/ 10:24:59.980:INFO:browser_app.cc(317)] Version NVIDIACEFClient/73.3683.1933.5/rel_03_28/9a1bfbe
+[3924-11-13/ 10:24:59.980:INFO:browser_app.cc(696)] CreateCefWindowInstance
+[3924-11-13/ 10:24:59.980:INFO:browser_app.cc(701)] Add handler 000001F9ADCEEA30
+[3924-11-13/ 10:24:59.980:WARNING:offscreen_window.cpp(94)] enabling gpu, using dx11
+[3924-11-13/ 10:24:59.983:INFO:utils_win.cc(179)] SetProcessDpiAwareness succeeded.
+[3924-11-13/ 10:25:00.021:INFO:offscreen_window.cpp(152)] main window is: 0000000000010B98
+[3924-11-13/ 10:25:00.022:INFO:offscreen_window.cpp(160)] window size: 1360 768
+[3924-11-13/ 10:25:00.027:INFO:offscreen_window.cpp(1112)] OnFocus: 0
+[3924-11-13/ 10:25:00.029:INFO:offscreen_window.cpp(190)] desktop window is: 0000000000010B9E
+[3924-11-13/ 10:25:00.031:INFO:offscreen_window.cpp(1112)] OnFocus: 0
+[3924-11-13/ 10:25:00.032:INFO:shadowplay_wrapper.cpp(206)] stream initialized to: 1360 x 768
+[3924-11-13/ 10:25:00.043:INFO:browser_app_win.cc(243)] CreateProcess "C:\Program Files (x86)\NVIDIA Corporation\NvNode\nvnodejslauncher.exe" --launcher="NVIDIA Share"
+[3924-11-13/ 10:25:00.182:INFO:cef_plugin_win.cpp(139)] Loaded Cef Plugin  cef/common/OverClocking.dll
+[3924-11-13/ 10:25:00.187:ERROR:cef_plugin_win.cpp(49)] Failed to map module libeay32.dll. Error 2
+[3924-11-13/ 10:25:00.187:ERROR:cef_plugin_win.cpp(58)] Failed to load dependency libeay32.dll. Error 126
+[3924-11-13/ 10:25:00.187:ERROR:cef_plugin_win.cpp(49)] Failed to map module ssleay32.dll. Error 2
+[3924-11-13/ 10:25:00.187:ERROR:cef_plugin_win.cpp(58)] Failed to load dependency ssleay32.dll. Error 126
+[3924-11-13/ 10:25:00.277:ERROR:cef_plugin_win.cpp(58)] Failed to load dependency poco.dll. Error 126
+[3924-11-13/ 10:25:00.300:INFO:browser_app_win.cc(258)] Node already running
+[3924-11-13/ 10:25:00.301:INFO:browser_app.cc(785)] Start app event thread
+[3924-11-13/ 10:25:00.302:ERROR:cef_plugin_win.cpp(58)] Failed to load dependency PocoInitializer.dll. Error 126
+[3924-11-13/ 10:25:00.306:WARNING:offscreen_layer.cpp(680)] creating browser layer: 1
+[3924-11-13/ 10:25:00.340:INFO:cef_plugin_win.cpp(139)] Loaded Cef Plugin  cef/share/MessageBusRouter.dll
+[3924-11-13/ 10:25:00.340:INFO:cef_plugin.cpp(69)] 2024-11-13T10:25:00.340[I]                     LoggingImpl.cpp:203  Initialize CrimsonNative logger
+
+[3924-11-13/ 10:25:02.136:ERROR:cache_util_win.cc(19)] Unable to move the cache: 0
+[3924-11-13/ 10:25:02.136:ERROR:cache_util.cc(140)] Unable to move cache folder C:\Users\mochi\AppData\Local\NVIDIA Corporation\NVIDIA Share\CefCache\Cache to C:\Users\mochi\AppData\Local\NVIDIA Corporation\NVIDIA Share\CefCache\old_Cache_000
+[3924-11-13/ 10:25:02.136:ERROR:disk_cache.cc(184)] Unable to create cache
+[3924-11-13/ 10:25:03.528:INFO:query_handler_win.cc(148)] Node info request success
+[3924-11-13/ 10:25:03.553:INFO:offscreen_window.cpp(1057)] setting zoom to: -1.89139
+[3924-11-13/ 10:25:03.553:INFO:simple_handler.cc(207)] Site load done with httpStatusCode 0
+[3924-11-13/ 10:25:07.242:INFO:shadowplay_wrapper.cpp(687)] Set m_is_experimental to 1
+[3924-11-13/ 19:58:06.192:INFO:offscreen_window.cpp(1177)] display change: 0 0 1360 768
+[3924-11-13/ 19:58:06.249:INFO:offscreen_window.cpp(1177)] display change: 0 0 1360 768
+[3924-11-13/ 19:58:11.794:WARNING:shadowplay_wrapper.cpp(543)] fullscreen check: 1 0 1360 768 0
+[3924-11-13/ 19:58:11.797:WARNING:shadowplay_wrapper.cpp(543)] fullscreen check: 1 0 1360 768 0
+[3924-11-13/ 19:58:11.797:INFO:sp_simple_handler.cpp(417)] Starting SP
+[3924-11-13/ 19:58:11.797:WARNING:offscreen_windowing_d3d11.cpp(86)] initializing d3d11 to: 1360x768 and hybrid: 0
+[3924-11-13/ 19:58:12.048:INFO:offscreen_renderer_d3d11.cpp(507)] Initializing osc d3d11 renderer to: 1360 768
+[3924-11-13/ 19:58:12.086:INFO:shadowplay_wrapper.cpp(235)]  Experimental Feature is ON. Using Optimized Path in StartStream
+[3924-11-13/ 19:58:12.086:INFO:shadowplay_wrapper.cpp(286)] StartStream:: m_displayRects size : 0, m_display: 1360 768
+[3924-11-13/ 19:58:12.086:INFO:shadowplay_wrapper.cpp(300)] start stream
+[3924-11-13/ 19:58:12.086:INFO:shadowplay_wrapper.cpp(388)]  Experimental Feature is ON. Using Optimized Path for UpdateStream
+[3924-11-13/ 19:58:12.086:INFO:shadowplay_wrapper.cpp(430)] UpdateOverlay:: m_displayRects size : 0
+[3924-11-13/ 19:58:29.979:WARNING:shadowplay_wrapper.cpp(543)] fullscreen check: 1 0 1360 768 0
+[3924-11-13/ 19:58:29.979:INFO:sp_simple_handler.cpp(470)] Closing SP
+[3924-11-13/ 19:58:29.979:INFO:shadowplay_wrapper.cpp(328)] stop stream
+[3924-11-13/ 23:57:32.518:INFO:offscreen_window.cpp(1235)] should close osc
+[3924-11-13/ 23:57:32.716:INFO:offscreen_window.cpp(1235)] should close osc
+[3924-11-13/ 23:57:33.151:INFO:offscreen_window.cpp(1177)] display change: 0 0 1360 768
+[3924-11-13/ 23:57:33.215:INFO:offscreen_window.cpp(1177)] display change: 0 0 1360 768
+[3924-11-14/ 00:05:31.648:INFO:offscreen_window.cpp(834)] should close osc from suspend
+[3924-11-14/ 00:05:31.653:INFO:offscreen_window.cpp(834)] should close osc from suspend
+[3924-11-14/ 12:15:46.622:WARNING:dns_config_service_win.cc(665)] Failed to read DnsConfig.
+[3924-11-14/ 12:15:51.643:WARNING:dns_config_service_win.cc(665)] Failed to read DnsConfig.
+[3924-11-14/ 12:15:52.075:INFO:offscreen_window.cpp(1177)] display change: 0 0 1920 1080
+[3924-11-14/ 12:15:52.120:INFO:offscreen_window.cpp(1177)] display change: 0 0 1920 1080
+[3924-11-14/ 12:15:52.143:INFO:offscreen_window.cpp(1177)] display change: 0 0 1920 1080
+[3924-11-14/ 12:15:52.163:INFO:shadowplay_wrapper.cpp(159)] Resizing stream..
+[3924-11-14/ 12:15:52.164:INFO:shadowplay_wrapper.cpp(206)] stream initialized to: 1920 x 1080
+[3924-11-14/ 12:15:52.807:INFO:offscreen_window.cpp(1057)] setting zoom to: 0
+[3924-11-14/ 12:15:53.139:INFO:offscreen_window.cpp(1177)] display change: 0 0 1920 1080
+[3924-11-14/ 12:15:55.717:INFO:browser_app_win.cc(155)] Force shutdown event
+[3924-11-14/ 12:15:55.717:INFO:simple_handler.cc(266)] Post TryCloseAllBrowsers
+[3924-11-14/ 12:15:55.717:INFO:simple_handler.cc(271)] TryCloseAllBrowsers
+[3924-11-14/ 12:15:55.960:INFO:simple_handler.cc(111)] DoClose 000001F9ADCEEA30
+[3924-11-14/ 12:15:55.976:INFO:simple_handler.cc(283)] CloseAllBrowsers
+[3924-11-14/ 12:15:55.977:INFO:browser_app.cc(914)] Removed handler 000001F9ADCEEA30
+[3924-11-14/ 12:15:55.977:INFO:browser_app.cc(953)] QuitAppMessageLoop
+[3924-11-14/ 12:15:56.221:INFO:browser_app.cc(900)] Shutdown app event thread
+[3924-11-14/ 12:15:56.221:INFO:cef_plugin_manager.cpp(139)] Wait for all plugins to stop
+[3924-11-14/ 12:15:56.235:INFO:cef_plugin_manager.cpp(147)] Stop complete
+[3924-11-14/ 12:15:56.393:INFO:browser_app.cc(978)] Browser app shutting down
+[3924-11-14/ 12:15:56.393:INFO:cefmain_win.cc(402)] CefShutdown
+[3924-11-14/ 12:15:56.880:INFO:cefmain_win.cc(404)] CefShutdown Done

@@ -1,27 +1,11 @@
+// lib/services/analysis_service.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/analysis_data.dart';
 
 class AnalysisService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Stream<TelurProduction> getTelurProductionStream() {
-    return _firestore
-        .collection('telur_production')
-        .doc('current')
-        .snapshots()
-        .map((snapshot) {
-      if (snapshot.exists) {
-        return TelurProduction.fromMap(snapshot.data()!);
-      }
-      return TelurProduction(
-        jantan: 0,
-        betina: 0,
-        periodeIni: 0,
-        betinaSebelumnya: 0,
-      );
-    });
-  }
-
+  // Stream untuk mendapatkan data analisis periode
   Stream<List<AnalysisData>> getAnalysisPeriodStream() {
     return _firestore
         .collection('analysis_periods')
@@ -33,5 +17,18 @@ class AnalysisService {
           .map((doc) => AnalysisData.fromMap(doc.data()))
           .toList();
     });
+  }
+
+  // Fungsi untuk menambah data analisis baru
+  Future<void> addAnalysisPeriod(AnalysisData data) async {
+    await _firestore.collection('analysis_periods').add(data.toMap());
+  }
+
+  // Fungsi untuk mendapatkan detail analisis berdasarkan tipe
+  Stream<DocumentSnapshot> getAnalysisTypeStream(String type, String userId) {
+    return _firestore
+        .collection('analysis_types')
+        .doc(type)
+        .snapshots();
   }
 }

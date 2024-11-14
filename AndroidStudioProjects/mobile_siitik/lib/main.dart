@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const LoginScreen(),  // Route ke LoginScreen
-        '/dashboard': (context) => const DashboardScreen(),  // Pastikan dashboard_screen.dart terdaftar di sini
+        '/home': (context) => DashboardScreen(),  // Pastikan dashboard_screen.dart terdaftar di sini
         // '/forgot-password': (context) => const ForgotPasswordScreen(),
       },
     );

@@ -15,7 +15,7 @@ class DashboardScreen extends StatelessWidget {
   final AnalysisService _analysisService = AnalysisService();
   final TelurService _telurService = TelurService();
 
-  DashboardScreen({Key? key}) : super(key: key);
+  DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

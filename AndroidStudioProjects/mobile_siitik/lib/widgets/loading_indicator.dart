@@ -7,12 +7,12 @@ class LoadingIndicator extends StatelessWidget {
   final String? message;
 
   const LoadingIndicator({
-    Key? key,
+    super.key,
     this.color,
     this.size = 50.0,
     this.strokeWidth = 4.0,
     this.message,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -54,12 +54,12 @@ class LoadingOverlay extends StatelessWidget {
   final Color? barrierColor;
 
   const LoadingOverlay({
-    Key? key,
+    super.key,
     required this.isLoading,
     required this.child,
     this.loadingMessage,
     this.barrierColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

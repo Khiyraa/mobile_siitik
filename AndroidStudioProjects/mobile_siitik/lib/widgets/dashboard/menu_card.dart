@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 
 class MenuGrid extends StatelessWidget {
-  const MenuGrid({Key? key}) : super(key: key);
+  const MenuGrid({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -83,11 +83,11 @@ class MenuButton extends StatelessWidget {
   final VoidCallback onTap;
 
   const MenuButton({
-    Key? key,
+    super.key,
     required this.label,
     required this.icon,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -131,11 +131,11 @@ class InfoDialog extends StatelessWidget {
   final List<String> content;
 
   const InfoDialog({
-    Key? key,
+    super.key,
     required this.title,
     required this.subtitle,
     required this.content,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -159,7 +159,7 @@ class InfoDialog extends StatelessWidget {
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          ...content.map((text) => Text(text)).toList(),
+          ...content.map((text) => Text(text)),
         ],
       ),
       actions: [

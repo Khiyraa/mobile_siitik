@@ -9,10 +9,10 @@ class SlidingChartCard extends StatefulWidget {
   final List<AnalysisData> analysisData;
 
   const SlidingChartCard({
-    Key? key,
+    super.key,
     required this.telurData,
     required this.analysisData,
-  }) : super(key: key);
+  });
 
   @override
   State<SlidingChartCard> createState() => _SlidingChartCardState();
@@ -199,7 +199,7 @@ class _SlidingChartCardState extends State<SlidingChartCard> {
                   ),
                 ),
                 borderData: FlBorderData(show: false),
-                gridData: FlGridData(show: false),
+                gridData: const FlGridData(show: false),
                 barGroups: [
                   BarChartGroupData(
                     x: 0,
@@ -264,7 +264,7 @@ class _SlidingChartCardState extends State<SlidingChartCard> {
           Expanded(
             child: LineChart(
               LineChartData(
-                gridData: FlGridData(show: true),
+                gridData: const FlGridData(show: true),
                 titlesData: _buildFinancialTitles(),
                 borderData: FlBorderData(show: true),
                 lineBarsData: [
@@ -273,14 +273,14 @@ class _SlidingChartCardState extends State<SlidingChartCard> {
                     isCurved: true,
                     color: Colors.green,
                     barWidth: 3,
-                    dotData: FlDotData(show: true),
+                    dotData: const FlDotData(show: true),
                   ),
                   LineChartBarData(
                     spots: costSpots,
                     isCurved: true,
                     color: Colors.red,
                     barWidth: 3,
-                    dotData: FlDotData(show: true),
+                    dotData: const FlDotData(show: true),
                   ),
                 ],
               ),
@@ -313,7 +313,7 @@ class _SlidingChartCardState extends State<SlidingChartCard> {
           Expanded(
             child: LineChart(
               LineChartData(
-                gridData: FlGridData(show: true),
+                gridData: const FlGridData(show: true),
                 titlesData: _buildFinancialTitles(),
                 borderData: FlBorderData(show: true),
                 lineBarsData: [
@@ -322,7 +322,7 @@ class _SlidingChartCardState extends State<SlidingChartCard> {
                     isCurved: true,
                     color: Colors.blue,
                     barWidth: 3,
-                    dotData: FlDotData(show: true),
+                    dotData: const FlDotData(show: true),
                     belowBarData: BarAreaData(
                       show: true,
                       color: Colors.blue.withOpacity(0.1),
@@ -365,8 +365,8 @@ class _SlidingChartCardState extends State<SlidingChartCard> {
           },
         ),
       ),
-      rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-      topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
     );
   }
 

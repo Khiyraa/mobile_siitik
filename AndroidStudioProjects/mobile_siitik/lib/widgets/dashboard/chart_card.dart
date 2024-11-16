@@ -9,10 +9,10 @@ class ChartCard extends StatelessWidget {
   final TelurProduction telurData;
 
   const ChartCard({
-    Key? key,
+    super.key,
     required this.analysisData,
     required this.telurData,
-  }) : super(key: key);
+  });
 
 
   @override
@@ -128,11 +128,11 @@ class ChartCard extends StatelessWidget {
                   ],
                 );
               }).toList(),
-              gridData: FlGridData(show: false),
+              gridData: const FlGridData(show: false),
               borderData: FlBorderData(show: false),
               titlesData: FlTitlesData(
-                topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,

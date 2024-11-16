@@ -20,10 +20,10 @@ class TelurProduction {
 
   factory TelurProduction.fromMap(Map<String, dynamic> map) {
     return TelurProduction(
-      jantan: (map['jantan'] as num).toInt(),
-      betina: (map['betina'] as num).toInt(),
-      periodeIni: (map['periode_ini'] as num).toDouble(),
-      betinaSebelumnya: (map['betina_sebelumnya'] as num).toDouble(),
+      jantan: (map['jumlahTelur'] as num).toInt(),
+      betina: (map['jumlahTelurMenetas'] as num).toInt(),
+      periodeIni: (map['jumlahTelur'] as num).toDouble(),
+      betinaSebelumnya: (map['betinaSebelumnya'] as num?)?.toDouble() ?? 0.0,
       createdAt: (map['created_at'] as Timestamp).toDate(),
       userId: map['userId'] as String,
     );
@@ -31,10 +31,10 @@ class TelurProduction {
 
   Map<String, dynamic> toMap() {
     return {
-      'jantan': jantan,
-      'betina': betina,
-      'periode_ini': periodeIni,
-      'betina_sebelumnya': betinaSebelumnya,
+      'jumlahTelur': jantan,
+      'jumlahTelurMenetas': betina,
+      'periodeIni': periodeIni,
+      'betinaSebelumnya': betinaSebelumnya,
       'created_at': Timestamp.fromDate(createdAt),
       'userId': userId,
     };

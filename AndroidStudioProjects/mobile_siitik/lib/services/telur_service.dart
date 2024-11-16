@@ -1,162 +1,174 @@
+// lib/services/telur_service.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/telur_production.dart';
+import 'package:mobile_siitik/services/FirebaseDataAccess.dart';
 
 class TelurService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseDataAccess _firebaseDataAccess = FirebaseDataAccess();
 
-  // Collection references
-  CollectionReference get _telurCollection =>
-      _firestore.collection('telur_production');
 
-  // Stream untuk mendapatkan data produksi telur terbaru
+  Future<Map<String, dynamic>> getAnalysisPeriodData() async {
+    return await _firebaseDataAccess.getAnalysisPeriodData();
+  }
+
+  Future<Map<String, dynamic>> getHatchingData() async {
+    return await _firebaseDataAccess.getHatchingData();
+  }
+
+  Future<Map<String, dynamic>> getFatteningData() async {
+    return await _firebaseDataAccess.getFatteningData();
+  }
+
+  // Stream untuk mendapatkan data telur terbaru
   Stream<TelurProduction> getTelurProductionStream() {
-    return _telurCollection
+    final userId = _auth.currentUser?.email;
+    if (userId == null) {
+      throw Exception('User tidak terautentikasi');
+    }
+
+    return _firestore
+        .collection('analysis_periods')
+        .where('userId', isEqualTo: userId)
         .orderBy('created_at', descending: true)
         .limit(1)
         .snapshots()
-        .map((snapshot) {
+        .asyncMap((snapshot) async {
       if (snapshot.docs.isEmpty) {
-        // Return data default jika belum ada data
+        // Return default values jika tidak ada data
         return TelurProduction(
-          jantan: 0,
-          betina: 0,
-          periodeIni: 0,
-          betinaSebelumnya: 0,
+          jantan: 150,
+          betina: 100,
+          periodeIni: 25,
+          betinaSebelumnya: 40,
           createdAt: DateTime.now(),
-          userId: '',
+          userId: userId,
         );
       }
-      return TelurProduction.fromMap(
-          snapshot.docs.first.data() as Map<String, dynamic>
+
+      final currentDoc = snapshot.docs.first;
+      final currentData = currentDoc.data();
+
+      // Mengambil data periode sebelumnya
+      final previousSnapshot = await _firestore
+          .collection('analysis_periods')
+          .where('userId', isEqualTo: userId)
+          .where('created_at', isLessThan: currentData['created_at'])
+          .orderBy('created_at', descending: true)
+          .limit(1)
+          .get();
+
+      final previousProduction = previousSnapshot.docs.isNotEmpty
+          ? previousSnapshot.docs.first.data()['jumlahTelur'] ?? 0.0
+          : 0.0;
+
+      return TelurProduction(
+        jantan: currentData['jumlahTelur'] ?? 0,
+        betina: currentData['jumlahTelurMenetas'] ?? 0,
+        periodeIni: (currentData['jumlahTelur'] ?? 0).toDouble(),
+        betinaSebelumnya: previousProduction.toDouble(),
+        createdAt: (currentData['created_at'] as Timestamp).toDate(),
+        userId: userId,
       );
     });
   }
 
-  // Mendapatkan data produksi telur berdasarkan periode
-  Future<List<TelurProduction>> getTelurProductionByPeriod({
-    required DateTime startDate,
-    required DateTime endDate,
+  // Method untuk menyimpan data produksi telur baru
+  Future<void> saveTelurProduction({
+    required int jumlahTelur,
+    required int jumlahTelurMenetas,
   }) async {
-    final snapshot = await _telurCollection
-        .where('created_at', isGreaterThanOrEqualTo: startDate)
-        .where('created_at', isLessThanOrEqualTo: endDate)
-        .orderBy('created_at', descending: true)
-        .get();
-
-    return snapshot.docs
-        .map((doc) => TelurProduction.fromMap(doc.data() as Map<String, dynamic>))
-        .toList();
-  }
-
-  // Menambah data produksi telur baru
-  Future<void> addTelurProduction(TelurProduction production) async {
-    await _telurCollection.add(production.toMap());
-  }
-
-  // Mengupdate data produksi telur
-  Future<void> updateTelurProduction(
-      String id,
-      TelurProduction production,
-      ) async {
-    await _telurCollection.doc(id).update(production.toMap());
-  }
-
-  // Menghapus data produksi telur
-  Future<void> deleteTelurProduction(String id) async {
-    await _telurCollection.doc(id).delete();
-  }
-
-  // Mendapatkan ringkasan produksi untuk dashboard
-  Future<Map<String, dynamic>> getTelurProductionSummary() async {
-    final now = DateTime.now();
-    final lastMonth = DateTime(now.year, now.month - 1, now.day);
-
-    final currentProduction = await _telurCollection
-        .where('created_at', isGreaterThanOrEqualTo: lastMonth)
-        .orderBy('created_at', descending: true)
-        .get();
-
-    if (currentProduction.docs.isEmpty) {
-      return {
-        'total_ducks': 0,
-        'total_production': 0,
-        'production_rate': 0,
-        'monthly_change': 0,
-      };
+    final userId = _auth.currentUser?.email;
+    if (userId == null) {
+      throw Exception('User tidak terautentikasi');
     }
 
-    final latestData = TelurProduction.fromMap(
-        currentProduction.docs.first.data() as Map<String, dynamic>
-    );
+    // Pertama, simpan analysis type
+    await _firestore
+        .collection('analysis_types')
+        .doc('detail_layer')
+        .set({
+      'userId': userId,
+      'created_at': Timestamp.now(),
+    }, SetOptions(merge: true));
 
-    return {
-      'total_ducks': latestData.totalDucks,
-      'total_production': latestData.periodeIni,
-      'production_rate': latestData.productionPercentage,
-      'monthly_change': latestData.productionChange,
-    };
-  }
-
-  // Stream untuk monitoring perubahan total itik
-  Stream<int> getTotalDucksStream() {
-    return _telurCollection
-        .orderBy('created_at', descending: true)
-        .limit(1)
-        .snapshots()
-        .map((snapshot) {
-      if (snapshot.docs.isEmpty) return 0;
-      final data = TelurProduction.fromMap(
-          snapshot.docs.first.data() as Map<String, dynamic>
-      );
-      return data.totalDucks;
+    // Kemudian simpan data analisis
+    await _firestore
+        .collection('analysis_periods')
+        .add({
+      'userId': userId,
+      'jumlahTelur': jumlahTelur,
+      'jumlahTelurMenetas': jumlahTelurMenetas,
+      'created_at': Timestamp.now(),
     });
   }
 
-  // Stream untuk monitoring produksi harian
-  Stream<List<TelurProduction>> getDailyProductionStream(DateTime date) {
-    final startOfDay = DateTime(date.year, date.month, date.day);
-    final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
-
-    return _telurCollection
-        .where('created_at', isGreaterThanOrEqualTo: startOfDay)
-        .where('created_at', isLessThanOrEqualTo: endOfDay)
-        .snapshots()
-        .map((snapshot) => snapshot.docs
-        .map((doc) => TelurProduction.fromMap(doc.data() as Map<String, dynamic>))
-        .toList());
-  }
-
-  // Mendapatkan statistik produksi
-  Future<Map<String, dynamic>> getProductionStatistics({
-    required DateTime startDate,
-    required DateTime endDate,
+  // Method untuk mengupdate data produksi telur
+  Future<void> updateTelurProduction({
+    required String docId,
+    required int jumlahTelur,
+    required int jumlahTelurMenetas,
   }) async {
-    final snapshot = await _telurCollection
-        .where('created_at', isGreaterThanOrEqualTo: startDate)
-        .where('created_at', isLessThanOrEqualTo: endDate)
-        .orderBy('created_at')
-        .get();
-
-    final productions = snapshot.docs
-        .map((doc) => TelurProduction.fromMap(doc.data() as Map<String, dynamic>))
-        .toList();
-
-    if (productions.isEmpty) {
-      return {
-        'average_production': 0,
-        'highest_production': 0,
-        'lowest_production': 0,
-        'total_production': 0,
-      };
+    final userId = _auth.currentUser?.email;
+    if (userId == null) {
+      throw Exception('User tidak terautentikasi');
     }
 
-    final productionValues = productions.map((p) => p.periodeIni).toList();
+    await _firestore
+        .collection('analysis_periods')
+        .doc(docId)
+        .update({
+      'jumlahTelur': jumlahTelur,
+      'jumlahTelurMenetas': jumlahTelurMenetas,
+      'updated_at': Timestamp.now(),
+    });
+  }
 
-    return {
-      'average_production': productionValues.reduce((a, b) => a + b) / productionValues.length,
-      'highest_production': productionValues.reduce((a, b) => a > b ? a : b),
-      'lowest_production': productionValues.reduce((a, b) => a < b ? a : b),
-      'total_production': productionValues.reduce((a, b) => a + b),
-    };
+  // Method untuk mendapatkan riwayat produksi telur
+  Stream<List<TelurProduction>> getTelurProductionHistory() {
+    final userId = _auth.currentUser?.email;
+    if (userId == null) {
+      throw Exception('User tidak terautentikasi');
+    }
+
+    return _firestore
+        .collection('analysis_periods')
+        .where('userId', isEqualTo: userId)
+        .orderBy('created_at', descending: true)
+        .snapshots()
+        .asyncMap((snapshot) async {
+      List<TelurProduction> productions = [];
+
+      for (var doc in snapshot.docs) {
+        final data = doc.data();
+        final createdAt = (data['created_at'] as Timestamp).toDate();
+
+        // Mengambil data periode sebelumnya untuk setiap dokumen
+        final previousSnapshot = await _firestore
+            .collection('analysis_periods')
+            .where('userId', isEqualTo: userId)
+            .where('created_at', isLessThan: data['created_at'])
+            .orderBy('created_at', descending: true)
+            .limit(1)
+            .get();
+
+        final previousProduction = previousSnapshot.docs.isNotEmpty
+            ? previousSnapshot.docs.first.data()['jumlahTelur'] ?? 0.0
+            : 0.0;
+
+        productions.add(TelurProduction(
+          jantan: data['jumlahTelur'] ?? 0,
+          betina: data['jumlahTelurMenetas'] ?? 0,
+          periodeIni: (data['jumlahTelur'] ?? 0).toDouble(),
+          betinaSebelumnya: previousProduction.toDouble(),
+          createdAt: createdAt,
+          userId: userId,
+        ));
+      }
+
+      return productions;
+    });
   }
 }

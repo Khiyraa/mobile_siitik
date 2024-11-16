@@ -12,7 +12,7 @@ void main() async {
 
   runApp(const
   MyApp());
-  }
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const LoginScreen(),  // Route ke LoginScreen
-        '/dashboard': (context) => const DashboardScreen(),  // Pastikan dashboard_screen.dart terdaftar di sini
+        '/dashboard': (context) => DashboardScreen(),  // Pastikan dashboard_screen.dart terdaftar di sini
         // '/forgot-password': (context) => const ForgotPasswordScreen(),
       },
     );

@@ -8,6 +8,7 @@ import '../../core/constants/app_strings.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../utils/validators.dart';
+import 'package:mobile_siitik/widgets/loading_indicator.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -164,7 +165,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Stack( // Tambahkan Stack sebagai widget utama
+      children: [
+      Scaffold(
       backgroundColor: AppColors.background,
       body: SingleChildScrollView(
         child: SafeArea(
@@ -328,6 +331,16 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
+      ),
+          if (_isLoading)
+        Container(
+          color: Colors.black.withOpacity(0.5),
+          child: const LoadingIndicator(
+            color: AppColors.primary,
+            message: 'Mohon tunggu...',
+          ),
+        ),
+      ],
     );
   }
 

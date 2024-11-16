@@ -124,13 +124,13 @@ class _SlidingChartCardState extends State<SlidingChartCard> {
             child: PieChart(
               PieChartData(
                 sectionsSpace: 0,
-                centerSpaceRadius: 40,
+                centerSpaceRadius: 10,
                 sections: [
                   PieChartSectionData(
                     color: Colors.blue,
                     value: widget.telurData.jantan.toDouble(),
                     title: '${widget.telurData.jantan}',
-                    radius: 100,
+                    radius: 70,
                     titleStyle: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -140,7 +140,7 @@ class _SlidingChartCardState extends State<SlidingChartCard> {
                     color: Colors.pink,
                     value: widget.telurData.betina.toDouble(),
                     title: '${widget.telurData.betina}',
-                    radius: 100,
+                    radius: 70,
                     titleStyle: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,

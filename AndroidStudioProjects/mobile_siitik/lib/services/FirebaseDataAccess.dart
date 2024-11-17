@@ -22,32 +22,32 @@ class FirebaseDataAccess {
       : _firestore = FirebaseFirestore.instance,
         _auth = FirebaseAuth.instance;
 
-  // Get current user ID safely
-  String get _userId {
+  // Get current user email safely
+  String get _userEmail {
     final user = _auth.currentUser;
     if (user == null) throw FirebaseException('User tidak terautentikasi');
-    return user.uid;
+    return user.email ?? ''; // pastikan email tidak null
   }
 
   // Generic method untuk mengambil data dengan error handling yang lebih baik
   Future<Map<String, dynamic>> _fetchLatestDocument({
-    required String collection,
+    required String analysisType,
     required Map<String, dynamic> defaultData,
   }) async {
     try {
-      print('Mengambil data dari koleksi: $collection');
-      print('User ID: $_userId');
+      print('Mengambil data dari koleksi: $analysisType');
+      print('User email: $_userEmail');
 
+      // Ambil dokumen pertama berdasarkan email pengguna
       final QuerySnapshot snapshot = await _firestore
-          .collection(collection)
-          .where('userId', isEqualTo: _userId)
-          .orderBy('created_at', descending: true)
+          .collection(analysisType) // Koleksi berdasarkan tipe analisis
+          .where('userId', isEqualTo: _userEmail) // Mengganti userId dengan email
           .limit(1)
           .get()
           .timeout(
         const Duration(seconds: 15),
         onTimeout: () => throw FirebaseException(
-          'Timeout saat mengambil data dari $collection',
+          'Timeout saat mengambil data dari $analysisType',
         ),
       );
 
@@ -58,11 +58,27 @@ class FirebaseDataAccess {
         return defaultData;
       }
 
-      final data = snapshot.docs.first.data() as Map<String, dynamic>;
-      _validateData(data, collection);
+      final document = snapshot.docs.first;
+      final String idAnalisis = document.id;
+      final data = document.data() as Map<String, dynamic>;
 
-      print('Data berhasil diambil dari $collection');
-      return data;
+      // Ambil data subkoleksi 'analisis_periode' menggunakan ID dokumen
+      final subcollectionSnapshot = await _firestore
+          .collection(analysisType)
+          .doc(idAnalisis)
+          .collection('analisis_periode')
+          .get();
+
+      final subcollectionData = subcollectionSnapshot.docs.map((doc) {
+        return doc.data();
+      }).toList();
+
+      print('Data periode dari subkoleksi: $subcollectionData');
+
+      _validateData(data, analysisType);
+
+      print('Data berhasil diambil dari $analysisType');
+      return {...data, 'analisis_periode': subcollectionData};
     } on FirebaseAuthException catch (e) {
       throw FirebaseException('Auth error: ${e.message}');
     } on FirebaseException catch (e) {
@@ -78,12 +94,15 @@ class FirebaseDataAccess {
     final requiredFields = _getRequiredFields(collection);
     for (final field in requiredFields) {
       if (!data.containsKey(field)) {
+        print('Field tidak ditemukan: $field');
+        // Lakukan penanganan berbeda di sini (misalnya, berikan nilai default)
         throw FirebaseException(
           'Data tidak valid: field "$field" tidak ditemukan di $collection',
         );
       }
     }
   }
+
 
   // Helper untuk mendapatkan required fields berdasarkan collection
   List<String> _getRequiredFields(String collection) {
@@ -141,7 +160,7 @@ class FirebaseDataAccess {
     };
 
     return _fetchLatestDocument(
-      collection: 'detail_layer',
+      analysisType: 'detail_layer',
       defaultData: defaultData,
     );
   }
@@ -183,7 +202,7 @@ class FirebaseDataAccess {
     };
 
     return _fetchLatestDocument(
-      collection: 'detail_penetasan',
+      analysisType: 'detail_penetasan',
       defaultData: defaultData,
     );
   }
@@ -212,23 +231,20 @@ class FirebaseDataAccess {
         'biayaOperasional': 0.0,
         'biayaOvk': 0.0,
         'biayaTenagaKerja': 0.0,
-        'hargaPakan': 0.0,
-        'jumlahPakan': 0.0,
+        'hargaItik': 0.0,
         'penyusutanPeralatan': 0.0,
         'sewaKandang': 0.0,
-        'standardPakan': 0.0,
         'totalBiaya': 0.0,
         'totalBiayaOperasional': 0.0,
         'totalCost': 0.0,
         'totalFixedCost': 0.0,
-        'totalHargaPakan': 0.0,
         'totalVariableCost': 0.0
       },
       'periode': 'Periode 1'
     };
 
     return _fetchLatestDocument(
-      collection: 'detail_penggemukan',
+      analysisType: 'detail_penggemukan',
       defaultData: defaultData,
     );
   }

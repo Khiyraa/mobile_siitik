@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../models/analysis_data.dart';
 import '../../models/telur_production.dart';
+import '../../services/FirebaseDataAccess.dart';
 
 class SlidingChartCard extends StatefulWidget {
   final TelurProduction telurData;
@@ -21,11 +22,34 @@ class SlidingChartCard extends StatefulWidget {
 class _SlidingChartCardState extends State<SlidingChartCard> {
   late PageController _pageController;
   int _currentPage = 0;
+  double jantan = 0.0;
+  double betina = 0.0;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 0);
+    _fetchData();
+  }
+
+  Future<void> _fetchData() async {
+    try {
+      // Fetch jantan and betina data
+      final fatteningData = await FirebaseDataAccess().getFatteningData();
+      final analysisPeriodData = await FirebaseDataAccess().getAnalysisPeriodData();
+
+      setState(() {
+        jantan = fatteningData['penerimaan']['jumlahItikSetelahMortalitas'] ?? 0.0;
+        betina = analysisPeriodData['penerimaan']['jumlahItikAwal'] ?? 0.0;
+        isLoading = false; // Data loaded
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false; // Handle error loading data
+      });
+      print('Error fetching data: $e');
+    }
   }
 
   @override
@@ -121,15 +145,17 @@ class _SlidingChartCardState extends State<SlidingChartCard> {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: PieChart(
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator()) // Show loading indicator
+                : PieChart(
               PieChartData(
                 sectionsSpace: 0,
                 centerSpaceRadius: 10,
                 sections: [
                   PieChartSectionData(
                     color: Colors.blue,
-                    value: widget.telurData.jantan.toDouble(),
-                    title: '${widget.telurData.jantan}',
+                    value: jantan > 0 ? jantan : 0.1, // Avoid 0 to keep the chart visible
+                    title: '${jantan.toStringAsFixed(1)}',
                     radius: 70,
                     titleStyle: const TextStyle(
                       color: Colors.white,
@@ -138,8 +164,8 @@ class _SlidingChartCardState extends State<SlidingChartCard> {
                   ),
                   PieChartSectionData(
                     color: Colors.pink,
-                    value: widget.telurData.betina.toDouble(),
-                    title: '${widget.telurData.betina}',
+                    value: betina > 0 ? betina : 0.1, // Avoid 0 to keep the chart visible
+                    title: '${betina.toStringAsFixed(1)}',
                     radius: 70,
                     titleStyle: const TextStyle(
                       color: Colors.white,

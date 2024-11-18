@@ -1,43 +1,43 @@
-[3924-11-16/ 06:38:38.820:INFO:browser_app.cc(313)] Framework Microsoft Windows 64bit
-[3924-11-16/ 06:38:38.820:INFO:browser_app.cc(317)] Version NVIDIACEFClient/73.3683.1933.5/rel_03_28/9a1bfbe
-[3924-11-16/ 06:38:38.820:INFO:browser_app.cc(696)] CreateCefWindowInstance
-[3924-11-16/ 06:38:38.820:INFO:browser_app.cc(701)] Add handler 00000263C3337B00
-[3924-11-16/ 06:38:38.821:WARNING:offscreen_window.cpp(94)] enabling gpu, using dx11
-[3924-11-16/ 06:38:38.822:INFO:utils_win.cc(179)] SetProcessDpiAwareness succeeded.
-[3924-11-16/ 06:38:38.838:INFO:offscreen_window.cpp(152)] main window is: 00000000005606D4
-[3924-11-16/ 06:38:38.839:INFO:offscreen_window.cpp(160)] window size: 1360 768
-[3924-11-16/ 06:38:38.846:INFO:offscreen_window.cpp(1112)] OnFocus: 0
-[3924-11-16/ 06:38:38.849:INFO:offscreen_window.cpp(190)] desktop window is: 0000000000070BF0
-[3924-11-16/ 06:38:38.852:INFO:offscreen_window.cpp(1112)] OnFocus: 0
-[3924-11-16/ 06:38:38.853:INFO:shadowplay_wrapper.cpp(206)] stream initialized to: 1360 x 768
-[3924-11-16/ 06:38:38.862:INFO:browser_app_win.cc(243)] CreateProcess "C:\Program Files (x86)\NVIDIA Corporation\NvNode\nvnodejslauncher.exe" --launcher="NVIDIA Share"
-[3924-11-16/ 06:38:38.909:INFO:cef_plugin_win.cpp(139)] Loaded Cef Plugin  cef/common/OverClocking.dll
-[3924-11-16/ 06:38:38.911:ERROR:cef_plugin_win.cpp(49)] Failed to map module libeay32.dll. Error 2
-[3924-11-16/ 06:38:38.911:ERROR:cef_plugin_win.cpp(58)] Failed to load dependency libeay32.dll. Error 126
-[3924-11-16/ 06:38:38.911:ERROR:cef_plugin_win.cpp(49)] Failed to map module ssleay32.dll. Error 2
-[3924-11-16/ 06:38:38.911:ERROR:cef_plugin_win.cpp(58)] Failed to load dependency ssleay32.dll. Error 126
-[3924-11-16/ 06:38:38.927:INFO:browser_app_win.cc(258)] Node already running
-[3924-11-16/ 06:38:38.929:INFO:browser_app.cc(785)] Start app event thread
-[3924-11-16/ 06:38:38.935:WARNING:offscreen_layer.cpp(680)] creating browser layer: 1
-[3924-11-16/ 06:38:38.986:ERROR:cef_plugin_win.cpp(58)] Failed to load dependency poco.dll. Error 126
-[3924-11-16/ 06:38:39.010:ERROR:cef_plugin_win.cpp(58)] Failed to load dependency PocoInitializer.dll. Error 126
-[3924-11-16/ 06:38:39.048:INFO:cef_plugin_win.cpp(139)] Loaded Cef Plugin  cef/share/MessageBusRouter.dll
-[3924-11-16/ 06:38:39.049:INFO:cef_plugin.cpp(69)] 2024-11-16T06:38:39.049[I]                     LoggingImpl.cpp:203  Initialize CrimsonNative logger
+[3924-11-17/ 16:41:10.229:INFO:browser_app.cc(313)] Framework Microsoft Windows 64bit
+[3924-11-17/ 16:41:10.229:INFO:browser_app.cc(317)] Version NVIDIACEFClient/73.3683.1933.5/rel_03_28/9a1bfbe
+[3924-11-17/ 16:41:10.229:INFO:browser_app.cc(696)] CreateCefWindowInstance
+[3924-11-17/ 16:41:10.232:INFO:browser_app.cc(701)] Add handler 00000221633E2DD0
+[3924-11-17/ 16:41:10.233:WARNING:offscreen_window.cpp(94)] enabling gpu, using dx11
+[3924-11-17/ 16:41:10.235:INFO:utils_win.cc(179)] SetProcessDpiAwareness succeeded.
+[3924-11-17/ 16:41:10.246:INFO:offscreen_window.cpp(152)] main window is: 000000000002046C
+[3924-11-17/ 16:41:10.247:INFO:offscreen_window.cpp(160)] window size: 1360 768
+[3924-11-17/ 16:41:10.251:INFO:offscreen_window.cpp(1112)] OnFocus: 0
+[3924-11-17/ 16:41:10.252:INFO:offscreen_window.cpp(190)] desktop window is: 0000000000010480
+[3924-11-17/ 16:41:10.253:INFO:offscreen_window.cpp(1112)] OnFocus: 0
+[3924-11-17/ 16:41:10.254:INFO:shadowplay_wrapper.cpp(206)] stream initialized to: 1360 x 768
+[3924-11-17/ 16:41:10.261:INFO:browser_app_win.cc(243)] CreateProcess "C:\Program Files (x86)\NVIDIA Corporation\NvNode\nvnodejslauncher.exe" --launcher="NVIDIA Share"
+[3924-11-17/ 16:41:10.349:INFO:cef_plugin_win.cpp(139)] Loaded Cef Plugin  cef/common/OverClocking.dll
+[3924-11-17/ 16:41:10.351:ERROR:cef_plugin_win.cpp(49)] Failed to map module libeay32.dll. Error 2
+[3924-11-17/ 16:41:10.351:ERROR:cef_plugin_win.cpp(58)] Failed to load dependency libeay32.dll. Error 126
+[3924-11-17/ 16:41:10.351:ERROR:cef_plugin_win.cpp(49)] Failed to map module ssleay32.dll. Error 2
+[3924-11-17/ 16:41:10.351:ERROR:cef_plugin_win.cpp(58)] Failed to load dependency ssleay32.dll. Error 126
+[3924-11-17/ 16:41:10.568:ERROR:cef_plugin_win.cpp(58)] Failed to load dependency poco.dll. Error 126
+[3924-11-17/ 16:41:10.595:ERROR:cef_plugin_win.cpp(58)] Failed to load dependency PocoInitializer.dll. Error 126
+[3924-11-17/ 16:41:10.683:INFO:cef_plugin_win.cpp(139)] Loaded Cef Plugin  cef/share/MessageBusRouter.dll
+[3924-11-17/ 16:41:10.685:INFO:cef_plugin.cpp(69)] 2024-11-17T16:41:10.684[I]                     LoggingImpl.cpp:203  Initialize CrimsonNative logger
 
-[3924-11-16/ 06:38:39.843:INFO:query_handler_win.cc(148)] Node info request success
-[3924-11-16/ 06:38:39.855:INFO:offscreen_window.cpp(1057)] setting zoom to: -1.89139
-[3924-11-16/ 06:38:39.855:INFO:simple_handler.cc(207)] Site load done with httpStatusCode 0
-[3924-11-16/ 06:38:40.986:INFO:shadowplay_wrapper.cpp(687)] Set m_is_experimental to 1
-[3924-11-16/ 06:59:02.179:INFO:browser_app_win.cc(155)] Force shutdown event
-[3924-11-16/ 06:59:02.180:INFO:simple_handler.cc(266)] Post TryCloseAllBrowsers
-[3924-11-16/ 06:59:02.180:INFO:simple_handler.cc(271)] TryCloseAllBrowsers
-[3924-11-16/ 06:59:02.185:INFO:simple_handler.cc(111)] DoClose 00000263C3337B00
-[3924-11-16/ 06:59:02.185:INFO:simple_handler.cc(283)] CloseAllBrowsers
-[3924-11-16/ 06:59:02.185:INFO:browser_app.cc(914)] Removed handler 00000263C3337B00
-[3924-11-16/ 06:59:02.185:INFO:browser_app.cc(953)] QuitAppMessageLoop
-[3924-11-16/ 06:59:02.192:INFO:browser_app.cc(900)] Shutdown app event thread
-[3924-11-16/ 06:59:02.193:INFO:cef_plugin_manager.cpp(139)] Wait for all plugins to stop
-[3924-11-16/ 06:59:02.193:INFO:cef_plugin_manager.cpp(147)] Stop complete
-[3924-11-16/ 06:59:02.201:INFO:browser_app.cc(978)] Browser app shutting down
-[3924-11-16/ 06:59:02.201:INFO:cefmain_win.cc(402)] CefShutdown
-[3924-11-16/ 06:59:02.218:INFO:cefmain_win.cc(404)] CefShutdown Done
+[3924-11-17/ 16:41:14.517:INFO:browser_app_win.cc(265)] nvnodejslauncher 0ExitCode: 0
+[3924-11-17/ 16:41:14.518:INFO:browser_app.cc(785)] Start app event thread
+[3924-11-17/ 16:41:14.539:WARNING:offscreen_layer.cpp(680)] creating browser layer: 1
+[3924-11-17/ 16:41:18.954:INFO:query_handler_win.cc(148)] Node info request success
+[3924-11-17/ 16:41:18.977:INFO:offscreen_window.cpp(1057)] setting zoom to: -1.89139
+[3924-11-17/ 16:41:18.977:INFO:simple_handler.cc(207)] Site load done with httpStatusCode 0
+[3924-11-17/ 16:41:31.321:INFO:shadowplay_wrapper.cpp(687)] Set m_is_experimental to 1
+[3924-11-17/ 16:41:57.753:INFO:browser_app_win.cc(155)] Force shutdown event
+[3924-11-17/ 16:41:57.753:INFO:simple_handler.cc(266)] Post TryCloseAllBrowsers
+[3924-11-17/ 16:41:57.753:INFO:simple_handler.cc(271)] TryCloseAllBrowsers
+[3924-11-17/ 16:41:57.763:INFO:simple_handler.cc(111)] DoClose 00000221633E2DD0
+[3924-11-17/ 16:41:57.764:INFO:simple_handler.cc(283)] CloseAllBrowsers
+[3924-11-17/ 16:41:57.764:INFO:browser_app.cc(914)] Removed handler 00000221633E2DD0
+[3924-11-17/ 16:41:57.764:INFO:browser_app.cc(953)] QuitAppMessageLoop
+[3924-11-17/ 16:41:57.771:INFO:browser_app.cc(900)] Shutdown app event thread
+[3924-11-17/ 16:41:57.771:INFO:cef_plugin_manager.cpp(139)] Wait for all plugins to stop
+[3924-11-17/ 16:41:57.771:INFO:cef_plugin_manager.cpp(147)] Stop complete
+[3924-11-17/ 16:41:57.780:INFO:browser_app.cc(978)] Browser app shutting down
+[3924-11-17/ 16:41:57.780:INFO:cefmain_win.cc(402)] CefShutdown
+[3924-11-17/ 16:41:57.807:INFO:cefmain_win.cc(404)] CefShutdown Done

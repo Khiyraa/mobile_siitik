@@ -14,7 +14,6 @@ class ChartCard extends StatelessWidget {
     required this.telurData,
   }) : super(key: key);
 
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -131,8 +130,10 @@ class ChartCard extends StatelessWidget {
               gridData: FlGridData(show: false),
               borderData: FlBorderData(show: false),
               titlesData: FlTitlesData(
-                topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles:
+                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles:
+                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
@@ -169,8 +170,18 @@ class ChartCard extends StatelessWidget {
 
   String _getMonthName(DateTime date) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
-      'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'Mei',
+      'Jun',
+      'Jul',
+      'Ags',
+      'Sep',
+      'Okt',
+      'Nov',
+      'Des'
     ];
     return months[date.month - 1];
   }
@@ -184,7 +195,9 @@ class ChartCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       decoration: BoxDecoration(
-        color: isPositive ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+        color: isPositive
+            ? Colors.green.withOpacity(0.1)
+            : Colors.red.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mobile_siitik/core/constants/app_colors.dart';
 import 'package:mobile_siitik/services/auth_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterDialog extends StatefulWidget {
   const RegisterDialog({Key? key}) : super(key: key);
@@ -25,9 +25,8 @@ class _RegisterDialogState extends State<RegisterDialog> {
 
     try {
       // Cek apakah email sudah terdaftar
-      final bool isEmailRegistered = await _authService.isEmailRegistered(
-          emailController.text.trim()
-      );
+      final bool isEmailRegistered =
+          await _authService.isEmailRegistered(emailController.text.trim());
 
       if (isEmailRegistered) {
         if (mounted) {
@@ -46,7 +45,8 @@ class _RegisterDialogState extends State<RegisterDialog> {
       );
 
       if (mounted) {
-        Navigator.of(context).pop(); // Close dialog after successful registration
+        Navigator.of(context)
+            .pop(); // Close dialog after successful registration
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Registrasi berhasil!')),
         );
@@ -120,7 +120,8 @@ class _RegisterDialogState extends State<RegisterDialog> {
     }
 
     // Validasi email
-    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(emailController.text)) {
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+        .hasMatch(emailController.text)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Format email tidak valid')),
       );
@@ -155,7 +156,8 @@ class _RegisterDialogState extends State<RegisterDialog> {
                 alignment: Alignment.topRight,
                 child: IconButton(
                   icon: const Icon(Icons.close),
-                  onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
+                  onPressed:
+                      _isLoading ? null : () => Navigator.of(context).pop(),
                 ),
               ),
 
@@ -191,7 +193,8 @@ class _RegisterDialogState extends State<RegisterDialog> {
                     border: InputBorder.none,
                     prefixIcon: Icon(Icons.email_outlined),
                     hintText: 'Masukkan Email',
-                    contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                   ),
                 ),
               ),
@@ -211,7 +214,8 @@ class _RegisterDialogState extends State<RegisterDialog> {
                     border: InputBorder.none,
                     prefixIcon: Icon(Icons.lock_outline),
                     hintText: 'Masukkan Password',
-                    contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                   ),
                 ),
               ),
@@ -230,7 +234,8 @@ class _RegisterDialogState extends State<RegisterDialog> {
                     border: InputBorder.none,
                     prefixIcon: Icon(Icons.person_outline),
                     hintText: 'Masukkan Username',
-                    contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                   ),
                 ),
               ),
@@ -250,17 +255,17 @@ class _RegisterDialogState extends State<RegisterDialog> {
                   ),
                   child: _isLoading
                       ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(color: Colors.white),
-                  )
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(color: Colors.white),
+                        )
                       : const Text(
-                    'Daftar',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                          'Daftar',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -271,10 +276,12 @@ class _RegisterDialogState extends State<RegisterDialog> {
                 children: [
                   const Text('Sudah Punya Akun? '),
                   GestureDetector(
-                    onTap: _isLoading ? null : () {
-                      Navigator.of(context).pop();
-                      // Add navigation to login screen if needed
-                    },
+                    onTap: _isLoading
+                        ? null
+                        : () {
+                            Navigator.of(context).pop();
+                            // Add navigation to login screen if needed
+                          },
                     child: Text(
                       'Masuk Sekarang',
                       style: TextStyle(

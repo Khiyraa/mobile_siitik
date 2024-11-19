@@ -78,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Terjadi kesalahan: ${e.message}'),
+              content: Text('Terjadi kesalahan: email atau password anda salah'),
             ),
           );
         }
@@ -340,7 +340,6 @@ class _LoginScreenState extends State<LoginScreen> {
             color: Colors.black.withOpacity(0.5),
             child: const LoadingIndicator(
               color: AppColors.primary,
-              message: 'Mohon tunggu...',
             ),
           ),
       ],

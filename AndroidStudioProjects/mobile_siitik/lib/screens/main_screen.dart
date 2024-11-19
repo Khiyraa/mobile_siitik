@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_siitik/screens/dashboard_screen.dart';
 import 'package:mobile_siitik/screens/riwayat_screen.dart';
+import 'package:mobile_siitik/screens/notification_screen.dart';
 import '../core/constants/app_colors.dart';
-import 'account_screen.dart'; // Import halaman AccountScreen
-// Import halaman lainnya jika diperlukan
+import 'account_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -19,7 +20,7 @@ class _MainScreenState extends State<MainScreen> {
     Center(child: Text('Link Ke Website')),
     RiwayatScreen(), // Halaman Riwayat
     DashboardScreen(),// Halaman Akun
-    Center(child: Text('Notifikasi')),
+    NotificationsPage(),
     AccountScreen(),
     // Halaman Notifikasi
   ];
@@ -49,12 +50,31 @@ class _MainScreenState extends State<MainScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildNavItem('Website', Icons.language, () {
+                _buildNavItem('Website', Icons.language, () async {
+                  final Uri uri = Uri.parse('https://siitik-mbkm.research-ai.my.id/');
 
-                  setState(() {
-                    _currentIndex = 0; // Mengubah halaman aktif
-                  });
-                  // Navigasi untuk Website bisa ditambahkan nanti
+                  try {
+                    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Tidak dapat membuka browser'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Pastikan Anda memiliki browser web yang terinstal'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                    print('Error: $e');
+                  }
                 }),
                 _buildNavItem('Riwayat', Icons.history, () {
                   setState(() {

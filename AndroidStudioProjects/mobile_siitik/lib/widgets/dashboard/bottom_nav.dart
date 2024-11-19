@@ -36,7 +36,7 @@ class BottomNav extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => RiwayatScreen()),
                 );
               }),
-              _buildNavItem('Logo Itik', Icons.pets, () {
+              _buildNavItem('Logo Itik', Image.asset('assets/images/logo2.png') as IconData, () {
                 // Tambahkan aksi yang relevan untuk Logo Itik
               }),
               _buildNavItem('Notifikasi', Icons.notifications, () {

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_siitik/screens/riwayat_screen.dart';
 import '../../core/constants/app_colors.dart';
+import 'package:mobile_siitik/screens/account_screen.dart';
 
 class BottomNav extends StatelessWidget {
   const BottomNav({super.key});
@@ -24,11 +26,29 @@ class BottomNav extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem('Website', Icons.language, () {}),
-              _buildNavItem('Riwayat', Icons.history, () {}),
-              _buildNavItem('Logo Itik', Icons.pets, () {}),
-              _buildNavItem('Notifikasi', Icons.notifications, () {}),
-              _buildNavItem('Akun', Icons.person, () {}),
+              _buildNavItem('Website', Icons.language, () {
+                // Navigasi untuk Website bisa ditambahkan nanti
+              }),
+              _buildNavItem('Riwayat', Icons.history, () {
+                // Navigasi ke halaman RiwayatScreen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => RiwayatScreen()),
+                );
+              }),
+              _buildNavItem('Logo Itik', Image.asset('assets/images/logo2.png') as IconData, () {
+                // Tambahkan aksi yang relevan untuk Logo Itik
+              }),
+              _buildNavItem('Notifikasi', Icons.notifications, () {
+                // Tambahkan aksi untuk Notifikasi
+              }),
+              _buildNavItem('Akun', Icons.person, () {
+                // Tambahkan aksi untuk Akun
+                Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AccountScreen()),
+                );
+              }),
             ],
           ),
         ),

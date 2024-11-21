@@ -1,21 +1,97 @@
 // lib/screens/dashboard_screen.dart
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:rxdart/rxdart.dart';
-import '../services/analysis_service.dart';
-import '../services/telur_service.dart';
-import '../models/analysis_data.dart';
-import '../models/telur_production.dart';
-import '../widgets/dashboard/sliding_chart_card.dart';
-import '../widgets/dashboard/info_card.dart';
-import '../widgets/dashboard/menu_card.dart';
-import '../widgets/dashboard/bottom_nav.dart';
-import '../widgets/loading_indicator.dart';
+import 'package:rxdart/streams.dart';
+import 'package:mobile_siitik/models/analysis_data.dart';
+import 'package:mobile_siitik/models/telur_production.dart';
+import 'package:mobile_siitik/services/analysis_service.dart';
+import 'package:mobile_siitik/services/telur_service.dart';
+import 'package:mobile_siitik/widgets/dashboard/bottom_nav.dart';
+import 'package:mobile_siitik/widgets/dashboard/info_card.dart';
+import 'package:mobile_siitik/widgets/dashboard/menu_card.dart';
+import 'package:mobile_siitik/widgets/dashboard/sliding_chart_card.dart';
+import 'package:mobile_siitik/widgets/loading_indicator.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
+  const DashboardScreen({Key? key}) : super(key: key);
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
   final AnalysisService _analysisService = AnalysisService();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final TelurService _telurService = TelurService();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  StreamSubscription? _subscription;
+  String? _currentDetailLayerId;
 
-  DashboardScreen({super.key});
+  @override
+  void initState() {
+    super.initState();
+    _setupStreams();
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _setupStreams() async {
+    try {
+      final detailLayer = await getLatestDetailLayer();
+      if (detailLayer != null) {
+        setState(() {
+          _currentDetailLayerId = detailLayer.id;
+        });
+      }
+    } catch (e) {
+      print('Error setting up streams: $e');
+    }
+  }
+
+  Future<DocumentSnapshot?> getLatestDetailLayer() async {
+    final userId = _auth.currentUser?.email;
+    if (userId == null) {
+      throw Exception('User tidak terautentikasi');
+    }
+    try {
+      final QuerySnapshot querySnapshot = await _firestore
+          .collection('detail_penetasan')
+          .where('userId', isEqualTo: userId)
+          .orderBy('created_at', descending: true)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        return querySnapshot.docs.first;
+      }
+      return null;
+    } catch (e) {
+      print('Error getting latest detail_layer: $e');
+      return null;
+    }
+  }
+
+  Stream<List<dynamic>> _getCombinedStream(String detailLayerId) {
+    return CombineLatestStream.list([
+      _telurService.getTelurProductionStream(detailLayerId),
+      _analysisService.getAnalysisPeriodStream(detailLayerId),
+    ]).handleError((error) {
+      print('Stream error: $error');
+      return [];
+    });
+  }
+
+  Future<void> _refreshData() async {
+    await _setupStreams();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,150 +140,143 @@ class DashboardScreen extends StatelessWidget {
         ],
       ),
       body: SafeArea(
-        child: StreamBuilder<List<dynamic>>(
-          stream: CombineLatestStream.list([
-            _telurService.getTelurProductionStream(),
-            _analysisService.getAnalysisPeriodStream(),
-          ]),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      color: Colors.red[300],
-                      size: 48,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Terjadi kesalahan:\n${snapshot.error}',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.red[300],
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton(
-                      onPressed: () {
-                        // Implementasi refresh
-                      },
-                      child: const Text('Coba Lagi'),
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            if (!snapshot.hasData) {
-              return const Center(
-                child: LoadingIndicator(
-                  message: 'Memuat data...',
-                ),
-              );
-            }
-
-            final telurData = snapshot.data![0] as TelurProduction;
-            final analysisData = snapshot.data![1] as List<AnalysisData>;
-
-            return RefreshIndicator(
-              onRefresh: () async {
-                // Implementasi refresh data
-              },
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: _currentDetailLayerId == null
+            ? const Center(child: CircularProgressIndicator())
+            : StreamBuilder<List<dynamic>>(
+                stream: _getCombinedStream(_currentDetailLayerId!),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const SizedBox(height: 20),
-                          // Summary Cards
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildSummaryCard(
-                                  'Produksi Telur',
-                                  '${telurData.periodeIni.toStringAsFixed(0)}',
-                                  'Telur/hari',
-                                  Icons.egg_outlined,
-                                  Colors.blue,
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: _buildSummaryCard(
-                                  'Total Itik',
-                                  '${telurData.totalDucks}',
-                                  'Ekor',
-                                  Icons.pest_control,
-                                  Colors.green,
-                                ),
-                              ),
-                            ],
+                          Icon(
+                            Icons.error_outline,
+                            color: Colors.red[300],
+                            size: 48,
                           ),
                           const SizedBox(height: 16),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildSummaryCard(
-                                  'Persentase Produksi',
-                                  '${telurData.productionPercentage.toStringAsFixed(1)}%',
-                                  'Produktivitas',
-                                  Icons.show_chart,
-                                  Colors.orange,
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: _buildSummaryCard(
-                                  'Perubahan',
-                                  '${telurData.productionChange.toStringAsFixed(1)}%',
-                                  'Dari periode sebelumnya',
-                                  Icons.trending_up,
-                                  telurData.productionChange >= 0 ? Colors.green : Colors.red,
-                                ),
-                              ),
-                            ],
+                          Text(
+                            'Terjadi kesalahan:\n${snapshot.error}',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.red[300],
+                              fontSize: 16,
+                            ),
                           ),
                           const SizedBox(height: 24),
-                          // Chart Section
-                          SlidingChartCard(
-                            analysisData: analysisData,
-                            telurData: telurData,
+                          ElevatedButton(
+                            onPressed: _refreshData,
+                            child: const Text('Coba Lagi'),
                           ),
-                          const SizedBox(height: 24),
-                          // Info Card
-                          const InfoCard(),
-                          const SizedBox(height: 24),
-                          // Menu Grid
-                          const MenuGrid(),
-                          const SizedBox(height: 100), // Spacing for bottom nav
+                        ],
+                      ),
+                    );
+                  }
+
+                  if (!snapshot.hasData) {
+                    return const Center(
+                      child: LoadingIndicator(
+                        message: 'Memuat data...',
+                      ),
+                    );
+                  }
+
+                  final telurData = snapshot.data![0] as TelurProduction;
+                  final analysisData = snapshot.data![1] as List<AnalysisData>;
+
+                  print("telurData ${analysisData}");
+                  return RefreshIndicator(
+                    onRefresh: _refreshData,
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 20),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _buildSummaryCard(
+                                        'Produksi Telur',
+                                        '${telurData.periodeIni.toStringAsFixed(0)}',
+                                        'Telur/hari',
+                                        Icons.egg_outlined,
+                                        Colors.blue,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: _buildSummaryCard(
+                                        'Total Itik',
+                                        '${telurData.totalDucks}',
+                                        'Ekor',
+                                        Icons.pest_control,
+                                        Colors.green,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _buildSummaryCard(
+                                        'Persentase Produksi',
+                                        '${telurData.productionPercentage.toStringAsFixed(1)}%',
+                                        'Produktivitas',
+                                        Icons.show_chart,
+                                        Colors.orange,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: _buildSummaryCard(
+                                        'Perubahan',
+                                        '${telurData.productionChange.toStringAsFixed(1)}%',
+                                        'Dari periode sebelumnya',
+                                        Icons.trending_up,
+                                        telurData.productionChange >= 0
+                                            ? Colors.green
+                                            : Colors.red,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 24),
+                                SlidingChartCard(
+                                  analysisData: analysisData,
+                                  telurData: telurData,
+                                ),
+                                const SizedBox(height: 24),
+                                const InfoCard(),
+                                const SizedBox(height: 24),
+                                const MenuGrid(),
+                                const SizedBox(height: 100),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
-            );
-          },
-        ),
       ),
-      bottomNavigationBar: const BottomNav(),
     );
   }
 
   Widget _buildSummaryCard(
-      String title,
-      String value,
-      String subtitle,
-      IconData icon,
-      Color color,
-      ) {
+    String title,
+    String value,
+    String subtitle,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(

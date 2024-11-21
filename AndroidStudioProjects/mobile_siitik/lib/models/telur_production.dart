@@ -5,7 +5,7 @@ class TelurProduction {
   final int jantan;
   final int betina;
   final double periodeIni;
-  final double betinaSebelumnya;
+  late final double betinaSebelumnya;
   final DateTime createdAt;
   final String userId;
 

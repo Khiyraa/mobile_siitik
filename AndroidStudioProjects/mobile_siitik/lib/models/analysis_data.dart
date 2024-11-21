@@ -50,9 +50,14 @@ class AnalysisData {
 
   // Factory constructor from Firestore
   factory AnalysisData.fromMap(Map<String, dynamic> map) {
-    final revenue = (map['revenue'] as num?)?.toDouble() ?? 0.0;
-    final cost = (map['cost'] as num?)?.toDouble() ?? 0.0;
-    final createdAt = (map['created_at'] as Timestamp?)?.toDate() ?? DateTime.now();
+    final revenue =
+        double.tryParse(map['penerimaan']['totalRevenue'].toString()) ?? 0.0;
+
+    // Konversi totalCost dari String ke double
+    final cost =
+        double.tryParse(map['pengeluaran']['totalCost'].toString()) ?? 0.0;
+    final createdAt =
+        (map['created_at'] as Timestamp?)?.toDate() ?? DateTime.now();
 
     return AnalysisData(
       revenue: revenue,

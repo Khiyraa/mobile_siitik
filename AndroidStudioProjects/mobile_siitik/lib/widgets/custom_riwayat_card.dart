@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_siitik/core/constants/app_colors.dart';
 
 class CustomRiwayatCard extends StatelessWidget {
   final IconData icon;
@@ -17,7 +18,8 @@ class CustomRiwayatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      color: AppColors.background,
+      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
       ),
@@ -50,7 +52,7 @@ class CustomRiwayatCard extends StatelessWidget {
                     child: Text(
                       time,
                       style: const TextStyle(
-                        color: Colors.grey,
+                        color: Colors.white,
                         fontSize: 12.0,
                       ),
                     ),

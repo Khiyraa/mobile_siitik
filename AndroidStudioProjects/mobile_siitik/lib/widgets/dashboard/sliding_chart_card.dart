@@ -193,11 +193,11 @@ class _SlidingChartCardState extends State<SlidingChartCard> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Expanded(
             child: BarChart(
               BarChartData(
-                alignment: BarChartAlignment.spaceAround,
+                alignment: BarChartAlignment.spaceBetween, // Mengubah alignment agar lebih renggang
                 maxY: 100,
                 titlesData: FlTitlesData(
                   bottomTitles: AxisTitles(
@@ -218,6 +218,7 @@ class _SlidingChartCardState extends State<SlidingChartCard> {
                         }
                         return SideTitleWidget(
                           axisSide: meta.axisSide,
+                          // space: 16, // Menambahkan ruang antara teks
                           child: Text(text, style: style),
                         );
                       },
@@ -233,7 +234,7 @@ class _SlidingChartCardState extends State<SlidingChartCard> {
                       BarChartRodData(
                         toY: widget.telurData.periodeIni.toDouble(),
                         color: Colors.blue,
-                        width: 20,
+                        width: 20, // Mengatur lebar bar agar lebih renggang
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(6),
                         ),
@@ -246,7 +247,7 @@ class _SlidingChartCardState extends State<SlidingChartCard> {
                       BarChartRodData(
                         toY: widget.telurData.betinaSebelumnya.toDouble(),
                         color: Colors.orange,
-                        width: 20,
+                        width: 20, // Mengatur lebar bar agar lebih renggang
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(6),
                         ),
@@ -261,6 +262,7 @@ class _SlidingChartCardState extends State<SlidingChartCard> {
       ),
     );
   }
+
 
   Widget _buildRevenueAndCostChart() {
     final revenueSpots = widget.analysisData

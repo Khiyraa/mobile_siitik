@@ -1,9 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+      scopes: ['email', 'profile'],
+      clientId: '272944052495-5979iuncr0ek5a198g7pdav572qm2tk0.apps.googleusercontent.com' // Client ID dari google-services.json
+  );
 
   // Stream untuk mendengarkan status autentikasi
   Stream<User?> get authStateChanges => _auth.authStateChanges();
@@ -60,40 +64,32 @@ class AuthService {
   }
 
   // Sign in dengan Google
-  Future<UserCredential?> signInWithGoogle() async {
+  Future<UserCredential> signInWithGoogle() async {
     try {
-      print('1. Memulai proses Google Sign In');
-      // Trigger the authentication flow
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) throw FirebaseAuthException(
+          code: 'cancelled',
+          message: 'Sign in dibatalkan'
+      );
 
-      if (googleUser == null) {
-        print('2. User membatalkan Google Sign In');
-        throw FirebaseAuthException(
-          code: 'user-cancelled',
-          message: 'User membatalkan proses login Google',
-        );
-      }
-
-      print('3. Berhasil mendapatkan akun Google: ${googleUser.email}');
-
-      // Obtain the auth details from the request
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      print('4. Berhasil mendapatkan authentication');
-
-      // Create a new credential
-      final credential = GoogleAuthProvider.credential(
+      final OAuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      print('5. Berhasil membuat credential');
 
-      // Sign in to Firebase with the Google credential
-      final userCredential = await _auth.signInWithCredential(credential);
-      print('6. Berhasil sign in ke Firebase dengan Google');
-
-      return userCredential;
+      // Coba register user baru
+      try {
+        return await _auth.createUserWithEmailAndPassword(
+            email: googleUser.email,
+            password: 'google-${DateTime.now().millisecondsSinceEpoch}'
+        );
+      } catch (e) {
+        // Jika email sudah ada, coba sign in
+        return await _auth.signInWithCredential(credential);
+      }
     } catch (e) {
-      print('Error dalam signInWithGoogle: $e');
+      print('Detailed error: $e');
       rethrow;
     }
   }

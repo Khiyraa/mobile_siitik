@@ -22,7 +22,7 @@ class TelurProduction {
     return TelurProduction(
       jantan: (map['jumlahTelur'] as num).toInt(),
       betina: (map['jumlahTelurMenetas'] as num).toInt(),
-      periodeIni: (map['jumlahTelur'] as num).toDouble(),
+      periodeIni: 219.toDouble(),
       betinaSebelumnya: (map['betinaSebelumnya'] as num?)?.toDouble() ?? 0.0,
       createdAt: (map['created_at'] as Timestamp).toDate(),
       userId: map['userId'] as String,
@@ -48,6 +48,7 @@ class TelurProduction {
 
   // Helper method untuk mendapatkan perubahan produksi
   double get productionChange {
+    // print(betinaSebelumnya);
     if (betinaSebelumnya == 0) return 0;
     return ((periodeIni - betinaSebelumnya) / betinaSebelumnya) * 100;
   }

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_siitik/core/constants/app_colors.dart';
 import 'package:mobile_siitik/core/constants/app_images.dart';
 import 'package:mobile_siitik/services/auth_service.dart';
-import 'package:mobile_siitik/widgets/loading_indicator.dart';
+import 'package:mobile_siitik/widgets//loading_indicator.dart';
 import 'package:mobile_siitik/widgets/register_dialog.dart';
 import '../../core/constants/app_strings.dart';
 import '../../widgets/custom_button.dart';
@@ -48,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
         if (userCredential != null) {
           // Navigasi ke halaman dashboard setelah login berhasil
           Navigator.pushReplacementNamed(
-              context, '/home'); // '/home' akan membuka DashboardScreen
+              context, '/dashboard'); // '/home' akan membuka DashboardScreen
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Login berhasil!'),
@@ -78,7 +78,8 @@ class _LoginScreenState extends State<LoginScreen> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Terjadi kesalahan: email atau password anda salah'),
+              content:
+                  Text('Terjadi kesalahan: email atau password anda salah'),
             ),
           );
         }

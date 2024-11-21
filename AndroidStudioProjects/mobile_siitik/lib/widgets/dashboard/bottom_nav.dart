@@ -36,7 +36,8 @@ class BottomNav extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => RiwayatScreen()),
                 );
               }),
-              _buildNavItem('Logo Itik', Image.asset('assets/images/logo2.png') as IconData, () {
+              _buildNavItem('Logo Itik',
+                  Image.asset('assets/images/logo2.png') as IconData, () {
                 // Tambahkan aksi yang relevan untuk Logo Itik
               }),
               _buildNavItem('Notifikasi', Icons.notifications, () {
@@ -45,8 +46,9 @@ class BottomNav extends StatelessWidget {
               _buildNavItem('Akun', Icons.person, () {
                 // Tambahkan aksi untuk Akun
                 Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AccountScreen()),
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const AccountScreen()),
                 );
               }),
             ],

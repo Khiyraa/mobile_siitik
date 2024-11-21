@@ -45,13 +45,13 @@ class FirebaseDataAccess {
           .limit(1)
           .get()
           .timeout(
-        const Duration(seconds: 15),
-        onTimeout: () => throw FirebaseException(
-          'Timeout saat mengambil data dari $collection',
-        ),
-      );
+            const Duration(seconds: 15),
+            onTimeout: () => throw FirebaseException(
+              'Timeout saat mengambil data dari $collection',
+            ),
+          );
 
-      print('Jumlah dokumen ditemukan: ${snapshot.docs.length}');
+      // print('Jumlah dokumen ditemukan: ${snapshot.docs.length}');
 
       if (snapshot.docs.isEmpty) {
         print('Tidak ada dokumen ditemukan. Mengembalikan data default');
@@ -88,7 +88,7 @@ class FirebaseDataAccess {
   // Helper untuk mendapatkan required fields berdasarkan collection
   List<String> _getRequiredFields(String collection) {
     switch (collection) {
-      case 'detail_layer':
+      case 'detail_penetasan':
         return ['hasilAnalisis', 'penerimaan', 'pengeluaran', 'periode'];
       case 'detail_penetasan':
         return ['hasilAnalisis', 'penerimaan', 'pengeluaran', 'periode'];
@@ -141,7 +141,7 @@ class FirebaseDataAccess {
     };
 
     return _fetchLatestDocument(
-      collection: 'detail_layer',
+      collection: 'detail_penetasan',
       defaultData: defaultData,
     );
   }

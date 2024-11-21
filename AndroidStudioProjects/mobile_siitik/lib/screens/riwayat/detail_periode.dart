@@ -1,9 +1,9 @@
 // lib/screens/detail_periode_page.dart
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-import 'package:mobile_siitik/core/constants/app_colors.dart';
-
+import 'package:mobile_siitik/core//constants/app_colors.dart';
 
 class DetailPeriodePage extends StatelessWidget {
   final String title;
@@ -16,42 +16,96 @@ class DetailPeriodePage extends StatelessWidget {
   }) : super(key: key);
 
   Future<List<Map<String, dynamic>>> getDetailPeriode() async {
+    final FirebaseAuth _auth = FirebaseAuth.instance;
+    final userId = _auth.currentUser?.email;
     List<Map<String, dynamic>> details = [];
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+    print(collectionName);
+
     try {
-      // Untuk collection dengan subcollection (detail_layer dan detail_penetasan)
-      if (collectionName != 'detail_penggemukan') {
-        // Menggunakan collectionGroup untuk mengambil semua dokumen dalam subcollection analisis_periode
+      // Untuk collection dengan subcollection (detail_penetasan dan detail_penetasan)
+      // if (collectionName == 'detail_penggemukan') {
+      //   // Menggunakan collectionGroup untuk mengambil semua dokumen dalam subcollection analisis_periode
+      //   QuerySnapshot periodeDocs = await _firestore
+      //       .collection('analisis_periode')
+      //       .orderBy('created_at', descending: true)
+      //       .get();
+
+      //   // print("periodeDocs.docs.length : ${periodeDocs.docs.length}");
+
+      //   for (var doc in periodeDocs.docs) {
+      //     // Dapatkan reference ke dokumen parent
+      //     DocumentReference parentRef = doc.reference.parent.parent!;
+
+      //     // Periksa apakah dokumen parent berasal dari collection yang kita inginkan
+      //     if (parentRef.parent.id == collectionName) {
+      //       var data = doc.data() as Map<String, dynamic>;
+      //       details.add({
+      //         'periode': data['periode'] ?? 'Tidak ada periode',
+      //         'data': data,
+      //         'id': doc.id,
+      //         'parentId': parentRef.id,
+      //       });
+      //     }
+      //   }
+      // } else {
+      // Untuk detail_penggemukan (tanpa subcollection)
+      // QuerySnapshot snapshot = await _firestore
+      //     .collection(collectionName)
+      //     .orderBy('created_at', descending: true)
+      //     .get();
+
+      // for (var doc in snapshot.docs) {
+      //   var data = doc.data() as Map<String, dynamic>;
+      //   details.add({
+      //     'periode': data['periode'] ?? 'Tidak ada periode',
+      //     'data': data,
+      //     'id': doc.id,
+      //   });
+      // }
+
+      // QuerySnapshot mainDocs = await _firestore
+      //     .collection(collectionName)
+      //     .where('userId', isEqualTo: userId)
+      //     .orderBy('created_at', descending: true)
+      //     .get();
+
+      // for (var mainDoc in mainDocs.docs) {
+      //   QuerySnapshot periodeDocs = await _firestore
+      //       .collection(collectionName)
+      //       .doc(mainDoc.id)
+      //       .collection('analisis_periode')
+      //       .get();
+
+      //   for (var doc in periodeDocs.docs) {
+      //     var data = doc.data() as Map<String, dynamic>;
+
+      //     details.add({
+      //       'periode': data['periode'] ?? 'Tidak ada periode',
+      //       'data': data,
+      //       'id': doc.id,
+      //     });
+      //   }
+      // }
+      // }
+
+      QuerySnapshot mainDocs = await _firestore
+          .collection(collectionName)
+          .where('userId', isEqualTo: userId)
+          .orderBy('created_at', descending: true)
+          .get();
+
+      for (var mainDoc in mainDocs.docs) {
         QuerySnapshot periodeDocs = await _firestore
-            .collectionGroup('analisis_periode')
-            .orderBy('created_at', descending: true)
+            .collection(collectionName)
+            .doc(mainDoc.id)
+            .collection('analisis_periode')
             .get();
 
         for (var doc in periodeDocs.docs) {
-          // Dapatkan reference ke dokumen parent
-          DocumentReference parentRef = doc.reference.parent.parent!;
-
-          // Periksa apakah dokumen parent berasal dari collection yang kita inginkan
-          if (parentRef.parent.id == collectionName) {
-            var data = doc.data() as Map<String, dynamic>;
-            details.add({
-              'periode': data['periode'] ?? 'Tidak ada periode',
-              'data': data,
-              'id': doc.id,
-              'parentId': parentRef.id,
-            });
-          }
-        }
-      } else {
-        // Untuk detail_penggemukan (tanpa subcollection)
-        QuerySnapshot snapshot = await _firestore
-            .collection(collectionName)
-            .orderBy('created_at', descending: true)
-            .get();
-
-        for (var doc in snapshot.docs) {
           var data = doc.data() as Map<String, dynamic>;
+
           details.add({
             'periode': data['periode'] ?? 'Tidak ada periode',
             'data': data,
@@ -66,6 +120,8 @@ class DetailPeriodePage extends StatelessWidget {
         var periodeB = int.tryParse(b['periode'].toString()) ?? 0;
         return periodeB.compareTo(periodeA); // descending order
       });
+
+      print(details.length);
 
       return details;
     } catch (e) {
@@ -85,6 +141,13 @@ class DetailPeriodePage extends StatelessWidget {
       print('Error formatting currency: $e');
       return 'Rp 0';
     }
+  }
+
+  String formatPersentase(dynamic value) {
+    if (value == null) return '0.00%';
+    if (value is String) return '${double.parse(value).toStringAsFixed(2)}%';
+    if (value is num) return '${value.toStringAsFixed(2)}%';
+    return '0.00%';
   }
 
   @override
@@ -120,7 +183,8 @@ class DetailPeriodePage extends StatelessWidget {
               itemBuilder: (context, index) {
                 final periodeData = details[index];
                 final data = periodeData['data'] as Map<String, dynamic>;
-                final hasilAnalisis = data['hasilAnalisis'] as Map<String, dynamic>;
+                final hasilAnalisis =
+                    data['hasilAnalisis'] as Map<String, dynamic>;
                 final penerimaan = data['penerimaan'] as Map<String, dynamic>;
 
                 // Informasi umum yang ada di semua analisis
@@ -129,14 +193,16 @@ class DetailPeriodePage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Periode ${periodeData['periode']}',
+                        ' ${periodeData['periode']}',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        hasilAnalisis['rcRatio'] >= 1 ? 'Efisien' : 'Tidak Efisien',
+                        hasilAnalisis['rcRatio'] >= 1
+                            ? 'Efisien'
+                            : 'Tidak Efisien',
                         style: TextStyle(
                           color: hasilAnalisis['rcRatio'] >= 1
                               ? Colors.green
@@ -168,19 +234,22 @@ class DetailPeriodePage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    _buildInfoRow('Jumlah Telur',
-                        '${penerimaan['jumlahTelur']} butir'),
+                    _buildInfoRow(
+                        'Jumlah Telur', '${penerimaan['jumlahTelur']} butir'),
                     _buildInfoRow('Telur Menetas',
                         '${penerimaan['jumlahTelurMenetas']} butir'),
-                    _buildInfoRow('Jumlah DOD',
-                        '${penerimaan['jumlahDOD']} ekor'),
+                    _buildInfoRow(
+                        'Jumlah DOD', '${penerimaan['jumlahDOD']} ekor'),
                     _buildInfoRow('Persentase Penetasan',
-                        '${penerimaan['persentase']?.toStringAsFixed(2)}%'),
-                    _buildInfoRow('Harga DOD',
-                        formatCurrency(penerimaan['hargaDOD']?.toDouble() ?? 0)),
+                        formatPersentase(penerimaan['persentase'])),
+                    _buildInfoRow(
+                        'Harga DOD',
+                        formatCurrency(
+                            penerimaan['hargaDOD']?.toDouble() ?? 0)),
                   ]);
                 } else if (collectionName == 'detail_penggemukan') {
-                  final pengeluaran = data['pengeluaran'] as Map<String, dynamic>;
+                  final pengeluaran =
+                      data['pengeluaran'] as Map<String, dynamic>;
                   commonInfo.addAll([
                     const Divider(),
                     Text(
@@ -198,8 +267,10 @@ class DetailPeriodePage extends StatelessWidget {
                         '${penerimaan['jumlahItikSetelahMortalitas']} ekor'),
                     _buildInfoRow('Persentase Mortalitas',
                         '${penerimaan['persentaseMortalitas']?.toStringAsFixed(2)}%'),
-                    _buildInfoRow('Harga per Itik',
-                        formatCurrency(penerimaan['hargaItik']?.toDouble() ?? 0)),
+                    _buildInfoRow(
+                        'Harga per Itik',
+                        formatCurrency(
+                            penerimaan['hargaItik']?.toDouble() ?? 0)),
                     const Divider(),
                     Text(
                       'Biaya Produksi',
@@ -212,10 +283,12 @@ class DetailPeriodePage extends StatelessWidget {
                     const SizedBox(height: 8),
                     _buildInfoRow('Standar Pakan',
                         '${pengeluaran['standardPakan']} gram'),
-                    _buildInfoRow('Jumlah Pakan',
-                        '${pengeluaran['jumlahPakan']} kg'),
-                    _buildInfoRow('Harga Pakan/kg',
-                        formatCurrency(pengeluaran['hargaPakan']?.toDouble() ?? 0)),
+                    _buildInfoRow(
+                        'Jumlah Pakan', '${pengeluaran['jumlahPakan']} kg'),
+                    _buildInfoRow(
+                        'Harga Pakan/kg',
+                        formatCurrency(
+                            pengeluaran['hargaPakan']?.toDouble() ?? 0)),
                   ]);
                 }
 
@@ -231,14 +304,16 @@ class DetailPeriodePage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Periode ${periodeData['periode']}',
+                                '${periodeData['periode']}',
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               Text(
-                                hasilAnalisis['rcRatio'] >= 1 ? 'Efisien' : 'Tidak Efisien',
+                                hasilAnalisis['rcRatio'] >= 1
+                                    ? 'Efisien'
+                                    : 'Tidak Efisien',
                                 style: TextStyle(
                                   color: hasilAnalisis['rcRatio'] >= 1
                                       ? Colors.green
@@ -249,15 +324,19 @@ class DetailPeriodePage extends StatelessWidget {
                             ],
                           ),
                           const Divider(),
-                          _buildInfoRow('R/C Ratio',
-                              hasilAnalisis['rcRatio']?.toStringAsFixed(2) ?? 'N/A'),
+                          _buildInfoRow(
+                              'R/C Ratio',
+                              hasilAnalisis['rcRatio']?.toStringAsFixed(2) ??
+                                  'N/A'),
                           _buildInfoRow('Margin of Safety',
                               '${hasilAnalisis['marginOfSafety']?.toStringAsFixed(2)}%'),
-                          _buildInfoRow('Laba',
-                              formatCurrency(hasilAnalisis['laba']?.toDouble() ?? 0)),
+                          _buildInfoRow(
+                              'Laba',
+                              formatCurrency(
+                                  hasilAnalisis['laba']?.toDouble() ?? 0)),
                           if (collectionName == 'detail_penetasan')
                             _buildInfoRow('Persentase Penetasan',
-                                '${penerimaan['persentase']?.toStringAsFixed(2)}%'),
+                                formatPersentase(penerimaan['persentase'])),
                         ],
                       ),
                     ),

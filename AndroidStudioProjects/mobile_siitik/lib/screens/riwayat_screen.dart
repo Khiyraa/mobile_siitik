@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mobile_siitik/core/constants/app_colors.dart';
@@ -9,9 +10,12 @@ class RiwayatScreen extends StatelessWidget {
   RiwayatScreen({Key? key}) : super(key: key); // Tambahkan Key
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Fungsi untuk menghitung rata-rata dari hasil analisis
   Future<Map<String, double>> calculateAverages(String collectionName) async {
+    final userId = _auth.currentUser?.email;
+
     Map<String, double> defaultValues = {
       'marginOfSafety': 0.0,
       'rcRatio': 0.0,
@@ -22,46 +26,50 @@ class RiwayatScreen extends StatelessWidget {
 
     try {
       // Khusus untuk penggemukan yang tidak memiliki subcollection
-      if (collectionName == 'detail_penggemukan') {
-        QuerySnapshot penggemukanDocs = await _firestore.collection(
-            collectionName).get();
 
-        if (penggemukanDocs.docs.isEmpty) return defaultValues;
+      // if (collectionName == 'detail_penggemukan') {
+      //   QuerySnapshot penggemukanDocs =
+      //       await _firestore.collection(collectionName).get();
 
-        double totalMos = 0;
-        double totalRc = 0;
-        double totalBepHarga = 0;
-        double totalBepHasil = 0;
-        double totalLaba = 0;
-        int count = 0;
+      //   if (penggemukanDocs.docs.isEmpty) return defaultValues;
 
-        for (var doc in penggemukanDocs.docs) {
-          var data = doc.data() as Map<String, dynamic>;
-          var analisis = data['hasilAnalisis'] as Map<String, dynamic>?;
+      //   double totalMos = 0;
+      //   double totalRc = 0;
+      //   double totalBepHarga = 0;
+      //   double totalBepHasil = 0;
+      //   double totalLaba = 0;
+      //   int count = 0;
 
-          if (analisis != null) {
-            totalMos += analisis['marginOfSafety'] ?? 0;
-            totalRc += analisis['rcRatio'] ?? 0;
-            totalBepHarga += analisis['bepHarga'] ?? 0;
-            totalBepHasil += analisis['bepHasil'] ?? 0;
-            totalLaba += analisis['laba'] ?? 0;
-            count++;
-          }
-        }
+      //   for (var doc in penggemukanDocs.docs) {
+      //     var data = doc.data() as Map<String, dynamic>;
+      //     var analisis = data['hasilAnalisis'] as Map<String, dynamic>?;
 
-        if (count == 0) return defaultValues;
+      //     if (analisis != null) {
+      //       totalMos += analisis['marginOfSafety'] ?? 0;
+      //       totalRc += analisis['rcRatio'] ?? 0;
+      //       totalBepHarga += analisis['bepHarga'] ?? 0;
+      //       totalBepHasil += analisis['bepHasil'] ?? 0;
+      //       totalLaba += analisis['laba'] ?? 0;
+      //       count++;
+      //     }
+      //   }
 
-        return {
-          'marginOfSafety': totalMos / count,
-          'rcRatio': totalRc / count,
-          'bepHarga': totalBepHarga / count,
-          'bepHasil': totalBepHasil / count,
-          'laba': totalLaba / count,
-        };
-      }
+      //   if (count == 0) return defaultValues;
+
+      //   return {
+      //     'marginOfSafety': totalMos / count,
+      //     'rcRatio': totalRc / count,
+      //     'bepHarga': totalBepHarga / count,
+      //     'bepHasil': totalBepHasil / count,
+      //     'laba': totalLaba / count,
+      //   };
+      // }
 
       // Untuk collection dengan subcollection (layer dan penetasan)
-      QuerySnapshot mainDocs = await _firestore.collection(collectionName)
+      QuerySnapshot mainDocs = await _firestore
+          .collection(collectionName)
+          .where('userId', isEqualTo: userId)
+          .orderBy('created_at', descending: true)
           .get();
 
       if (mainDocs.docs.isEmpty) return defaultValues;
@@ -110,8 +118,6 @@ class RiwayatScreen extends StatelessWidget {
     }
   }
 
-
-
   // Format angka ke rupiah
   String formatCurrency(double value) {
     try {
@@ -131,7 +137,8 @@ class RiwayatScreen extends StatelessWidget {
     return '${value.toStringAsFixed(2)}%';
   }
 
-  void _navigateToDetail(BuildContext context, String title, String collectionName) {
+  void _navigateToDetail(
+      BuildContext context, String title, String collectionName) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -144,12 +151,12 @@ class RiwayatScreen extends StatelessWidget {
   }
 
   Widget _buildAnalysisCard(
-      BuildContext context,
-      String title,
-      IconData icon,
-      Future<Map<String, double>> averagesFuture,
-      String collectionName,
-      ) {
+    BuildContext context,
+    String title,
+    IconData icon,
+    Future<Map<String, double>> averagesFuture,
+    String collectionName,
+  ) {
     return FutureBuilder<Map<String, double>>(
       future: averagesFuture,
       builder: (context, snapshot) {
@@ -169,15 +176,17 @@ class RiwayatScreen extends StatelessWidget {
           );
         }
 
-        final averages = snapshot.data ?? {
-          'marginOfSafety': 0.0,
-          'rcRatio': 0.0,
-          'bepHarga': 0.0,
-          'bepHasil': 0.0,
-          'laba': 0.0,
-        };
+        final averages = snapshot.data ??
+            {
+              'marginOfSafety': 0.0,
+              'rcRatio': 0.0,
+              'bepHarga': 0.0,
+              'bepHasil': 0.0,
+              'laba': 0.0,
+            };
 
-        return InkWell( // Ganti GestureDetector dengan InkWell untuk efek ripple
+        return InkWell(
+          // Ganti GestureDetector dengan InkWell untuk efek ripple
           onTap: () => _navigateToDetail(context, title, collectionName),
           child: CustomRiwayatCard(
             icon: icon,
@@ -195,8 +204,6 @@ class RiwayatScreen extends StatelessWidget {
       },
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -225,7 +232,6 @@ class RiwayatScreen extends StatelessWidget {
                 calculateAverages('detail_layer'),
                 'detail_layer',
               ),
-              const SizedBox(height: 8),
               _buildAnalysisCard(
                 context,
                 'Analisis Penetasan',
@@ -233,7 +239,6 @@ class RiwayatScreen extends StatelessWidget {
                 calculateAverages('detail_penetasan'),
                 'detail_penetasan',
               ),
-              const SizedBox(height: 8),
               _buildAnalysisCard(
                 context,
                 'Analisis Penggemukan',

@@ -22,14 +22,17 @@ class TelurService {
   }
 
   // Stream untuk mendapatkan data telur terbaru
-  Stream<TelurProduction> getTelurProductionStream(String idLayer) {
+  Stream<TelurProduction> getTelurProductionStream(
+      String idLayer, String idPenggemukan) {
     final userId = _auth.currentUser?.email;
+
+    // print(idPenggemukan.toString());
     if (userId == null) {
       throw Exception('User tidak terautentikasi');
     }
 
     return _firestore
-        .collection('detail_penetasan')
+        .collection('detail_layer')
         .doc(idLayer)
         .collection('analisis_periode')
         .orderBy('created_at', descending: true)
@@ -45,30 +48,47 @@ class TelurService {
         }
 
         final currentDoc = snapshot.docs.first;
-        final currentData = currentDoc.data();
+        final currentDataLayer = currentDoc.data();
+
         final Timestamp currentTimestamp =
-            currentData['created_at'] as Timestamp;
+            currentDataLayer['created_at'] as Timestamp;
         // print("currentTimestamp : $currentTimestamp");
 
         // Mengambil data periode sebelumnya dari subcollection yang sama
         final previousSnapshot = await _firestore
-            .collection('detail_penetasan')
+            .collection('detail_layer')
             .doc(idLayer)
             .collection('analisis_periode')
-             .where('created_at', isLessThan: currentData['created_at'])
+            .where('created_at', isLessThan: currentDataLayer['created_at'])
             .orderBy('created_at', descending: true)
             .limit(1)
             .get();
 
+        final penggemukanSnapshot = await _firestore
+            .collection('detail_penggemukan')
+            .doc(idPenggemukan)
+            .collection('analisis_periode')
+            .orderBy('created_at', descending: true)
+            .limit(1)
+            .get();
+
+        Map<String, dynamic> currentDataPenggemukan = {};
+
+        if (penggemukanSnapshot.docs.isNotEmpty) {
+          currentDataPenggemukan = penggemukanSnapshot.docs.first.data();
+        }
+
         final previousProduction = previousSnapshot.docs.isNotEmpty
-            ? previousSnapshot.docs.first.data()['penerimaan']['jumlahTelur'] ??
+            ? previousSnapshot.docs.first.data()['penerimaan']
+                    ['jumlahItikAwal'] ??
                 0.0
             : 0.1;
 
-        print("previousProduction : ${currentData}");
+        // print("previousProduction : $previousProduction");
 
         return _createTelurProduction(
-          currentData: currentData,
+          currentDataLayer: currentDataLayer,
+          currentDataPenggemukan: currentDataPenggemukan,
           previousProduction: previousProduction.toDouble(),
           userId: userId,
         );
@@ -91,17 +111,19 @@ class TelurService {
   }
 
   TelurProduction _createTelurProduction({
-    required Map<String, dynamic> currentData,
+    Map<String, dynamic> currentDataLayer = const {},
+    Map<String, dynamic> currentDataPenggemukan = const {},
     required double previousProduction,
     required String userId,
   }) {
-    final penerimaan = currentData['penerimaan'] as Map;
+    final penerimaan = currentDataLayer['penerimaan'] as Map;
+    final penerimaanPenggemukan = currentDataPenggemukan['penerimaan'] as Map;
     return TelurProduction(
-      jantan: penerimaan['jumlahTelur'] ?? 0,
-      betina: penerimaan['jumlahTelurMenetas'] ?? 0,
-      periodeIni: (penerimaan['jumlahTelur'] ?? 0).toDouble(),
+      jantan: penerimaanPenggemukan['jumlahItikSetelahMortalitas'] ?? 0,
+      betina: penerimaan['jumlahItikAwal'] ?? 0,
+      periodeIni: (penerimaan['jumlahTelurDihasilkan'] ?? 0).toDouble(),
       betinaSebelumnya: previousProduction,
-      createdAt: (currentData['created_at'] as Timestamp).toDate(),
+      createdAt: (currentDataLayer['created_at'] as Timestamp).toDate(),
       userId: userId,
     );
   }

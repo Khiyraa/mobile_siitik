@@ -129,7 +129,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 // TODO: Implementasi fitur upload foto
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Fitur upload foto akan segera hadir'),
+                                    content: Text(
+                                        'Fitur upload foto akan segera hadir'),
                                   ),
                                 );
                               },
@@ -158,7 +159,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.black, width: 1.0),
+                        borderSide:
+                            const BorderSide(color: Colors.black, width: 1.0),
                       ),
                     ),
                     validator: (value) {
@@ -184,19 +186,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       child: _isLoading
                           ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      )
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
                           : const Text(
-                        'Simpan Perubahan',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16),
-                      ),
+                              'Simpan Perubahan',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 16),
+                            ),
                     ),
                   ),
                 ],

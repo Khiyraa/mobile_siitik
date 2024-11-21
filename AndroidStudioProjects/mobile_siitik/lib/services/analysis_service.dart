@@ -15,6 +15,7 @@ class AnalysisService {
         .limit(12) // Ambil 12 bulan terakhir
         .snapshots()
         .map((snapshot) {
+      // print('Jumlah dokumen ditemukan: ${snapshot.docs[0].data()}');
       return snapshot.docs
           .map((doc) => AnalysisData.fromMap(doc.data()))
           .toList();

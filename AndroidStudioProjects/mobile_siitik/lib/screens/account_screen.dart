@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile_siitik/core/constants/app_colors.dart';
-import 'package:mobile_siitik/screens/akun/about_screen.dart';
-import 'package:mobile_siitik/screens/akun/edit_profile.dart';
-import 'package:mobile_siitik/screens/akun/help_screen.dart';
+import 'package:mobile_siitik/core//constants/app_colors.dart';
+import 'package:mobile_siitik/screens//akun/about_screen.dart';
+import 'package:mobile_siitik/screens//akun/edit_profile.dart';
+import 'package:mobile_siitik/screens//akun/help_screen.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({Key? key}) : super(key: key);
@@ -125,7 +125,8 @@ class AccountScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const EditProfileScreen()),
+                                builder: (context) =>
+                                    const EditProfileScreen()),
                           );
                         },
                       ),
@@ -141,10 +142,9 @@ class AccountScreen extends StatelessWidget {
                         title: const Text('Bantuan'),
                         onTap: () {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                              builder: (context) => const HelpScreen()),
-
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const HelpScreen()),
                           );
                         },
                       ),
@@ -156,7 +156,6 @@ class AccountScreen extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => const AboutScreen()),
-
                           );
                         },
                       ),

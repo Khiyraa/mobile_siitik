@@ -10,7 +10,6 @@ import 'package:mobile_siitik/models/analysis_data.dart';
 import 'package:mobile_siitik/models/telur_production.dart';
 import 'package:mobile_siitik/services/analysis_service.dart';
 import 'package:mobile_siitik/services/telur_service.dart';
-import 'package:mobile_siitik/widgets/dashboard/bottom_nav.dart';
 import 'package:mobile_siitik/widgets/dashboard/info_card.dart';
 import 'package:mobile_siitik/widgets/dashboard/menu_card.dart';
 import 'package:mobile_siitik/widgets/dashboard/sliding_chart_card.dart';
@@ -30,6 +29,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   StreamSubscription? _subscription;
   String? _currentDetailLayerId;
+  String? _currentDetailPenggemukanId;
+  String? _currentDetailPenetasanId;
 
   @override
   void initState() {
@@ -46,9 +47,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _setupStreams() async {
     try {
       final detailLayer = await getLatestDetailLayer();
+      final detailPenggemukan = await getLatestDetailPenggemukan();
+      final detailPenetasan = await getLatestDetailPenetasan();
       if (detailLayer != null) {
         setState(() {
           _currentDetailLayerId = detailLayer.id;
+        });
+      }
+
+      if (detailPenggemukan != null) {
+        setState(() {
+          _currentDetailPenggemukanId = detailPenggemukan.id;
+        });
+      }
+
+      if (detailPenetasan != null) {
+        setState(() {
+          _currentDetailPenetasanId = detailPenetasan.id;
         });
       }
     } catch (e) {
@@ -57,6 +72,52 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<DocumentSnapshot?> getLatestDetailLayer() async {
+    final userId = _auth.currentUser?.email;
+    if (userId == null) {
+      throw Exception('User tidak terautentikasi');
+    }
+    try {
+      final QuerySnapshot querySnapshot = await _firestore
+          .collection('detail_layer')
+          .where('userId', isEqualTo: userId)
+          .orderBy('created_at', descending: true)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        return querySnapshot.docs.first;
+      }
+      return null;
+    } catch (e) {
+      print('Error getting latest detail layer: $e');
+      return null;
+    }
+  }
+
+  Future<DocumentSnapshot?> getLatestDetailPenggemukan() async {
+    final userId = _auth.currentUser?.email;
+    if (userId == null) {
+      throw Exception('User tidak terautentikasi');
+    }
+    try {
+      final QuerySnapshot querySnapshot = await _firestore
+          .collection('detail_penggemukan')
+          .where('userId', isEqualTo: userId)
+          .orderBy('created_at', descending: true)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        return querySnapshot.docs.first;
+      }
+      return null;
+    } catch (e) {
+      print('Error getting latest detail layer: $e');
+      return null;
+    }
+  }
+
+  Future<DocumentSnapshot?> getLatestDetailPenetasan() async {
     final userId = _auth.currentUser?.email;
     if (userId == null) {
       throw Exception('User tidak terautentikasi');
@@ -74,15 +135,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
       }
       return null;
     } catch (e) {
-      print('Error getting latest detail_layer: $e');
+      print('Error getting latest detail layer: $e');
       return null;
     }
   }
 
-  Stream<List<dynamic>> _getCombinedStream(String detailLayerId) {
+  Stream<List<dynamic>> _getCombinedStream(String detailLayerId,
+      String detailPenggemukanid, String detailPenetasanId) {
     return CombineLatestStream.list([
-      _telurService.getTelurProductionStream(detailLayerId),
-      _analysisService.getAnalysisPeriodStream(detailLayerId),
+      _telurService.getTelurProductionStream(
+          detailLayerId, detailPenggemukanid),
+      _analysisService.getAnalysisPeriodStream(detailPenetasanId),
     ]).handleError((error) {
       print('Stream error: $error');
       return [];
@@ -143,7 +206,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: _currentDetailLayerId == null
             ? const Center(child: CircularProgressIndicator())
             : StreamBuilder<List<dynamic>>(
-                stream: _getCombinedStream(_currentDetailLayerId!),
+                stream: _getCombinedStream(
+                  _currentDetailLayerId!,
+                  _currentDetailPenggemukanId!,
+                  _currentDetailPenetasanId!,
+                ),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return Center(
@@ -185,7 +252,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   final telurData = snapshot.data![0] as TelurProduction;
                   final analysisData = snapshot.data![1] as List<AnalysisData>;
 
-                  print("telurData ${analysisData}");
+                  // print("telurData ${analysisData}");
                   return RefreshIndicator(
                     onRefresh: _refreshData,
                     child: SingleChildScrollView(

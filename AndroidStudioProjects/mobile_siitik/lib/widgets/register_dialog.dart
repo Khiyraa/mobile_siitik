@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mobile_siitik/core/constants/app_colors.dart';
 import 'package:mobile_siitik/services/auth_service.dart';
 
@@ -84,28 +85,46 @@ class _RegisterDialogState extends State<RegisterDialog> {
     }
   }
 
-  Future<void> _handleGoogleSignIn() async {
+  Future<void> _handleGoogleSignUp() async {
     setState(() => _isLoading = true);
 
     try {
-      final userCredential = await _authService.signInWithGoogle();
+      final googleUser = await GoogleSignIn(
+          scopes: ['email', 'profile'],
+          clientId: '272944052495-5979iuncr0ek5a198g7pdav572qm2tk0.apps.googleusercontent.com'
+      ).signIn();
 
-      if (userCredential != null && mounted) {
-        Navigator.of(context).pop();
+      if (googleUser == null) return;
+
+      final googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+
+      await _authService.registerWithEmailAndPassword(
+          email: userCredential.user!.email!,
+          password: 'google-${DateTime.now().millisecondsSinceEpoch}',
+          username: userCredential.user!.displayName ?? 'User'
+      );
+
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/dashboard');
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login dengan Google berhasil!')),
+          const SnackBar(content: Text('Registrasi Google berhasil!')),
         );
       }
     } catch (e) {
+      print('Error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal login dengan Google: ${e.toString()}')),
+          SnackBar(content: Text('Gagal registrasi: ${e.toString()}')),
         );
       }
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -317,7 +336,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
 
               // Google Sign In Button
               GestureDetector(
-                onTap: _isLoading ? null : _handleGoogleSignIn,
+                onTap: _isLoading ? null : _handleGoogleSignUp,
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(

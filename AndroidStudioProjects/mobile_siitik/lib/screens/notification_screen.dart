@@ -16,7 +16,9 @@ class NotificationsPage extends StatelessWidget {
       body: Container(
         color: AppColors.background,
         child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance.collectionGroup('analisis_periode').snapshots(),
+          stream: FirebaseFirestore.instance
+              .collectionGroup('analisis_periode')
+              .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -32,12 +34,16 @@ class NotificationsPage extends StatelessWidget {
 
             final notifications = _generateNotifications(snapshot.data!.docs);
 
-            return ListView.separated( // Gunakan ListView.separated untuk memberikan pemisah
+            return ListView.separated(
+              // Gunakan ListView.separated untuk memberikan pemisah
               itemCount: notifications.length,
-              separatorBuilder: (context, index) => const Divider(), // Tambahkan pemisah
+              separatorBuilder: (context, index) =>
+                  const Divider(), // Tambahkan pemisah
               itemBuilder: (context, index) {
-                return Card( // Bungkus ListTile dengan Card
-                  margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                return Card(
+                  // Bungkus ListTile dengan Card
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 8.0, vertical: 4.0),
                   color: Colors.white,
                   child: ListTile(
                     leading: const Icon(Icons.notification_important),
@@ -54,7 +60,8 @@ class NotificationsPage extends StatelessWidget {
     );
   }
 
-  List<Map<String, String>> _generateNotifications(List<QueryDocumentSnapshot> docs) {
+  List<Map<String, String>> _generateNotifications(
+      List<QueryDocumentSnapshot> docs) {
     final List<Map<String, String>> notifications = [];
 
     for (var doc in docs) {
@@ -68,7 +75,8 @@ class NotificationsPage extends StatelessWidget {
 
       // Analisis dari berbagai koleksi
       if (data.containsKey('hasilAnalisis')) {
-        final hasilAnalisis = data['hasilAnalisis'] as Map<String, dynamic>? ?? {};
+        final hasilAnalisis =
+            data['hasilAnalisis'] as Map<String, dynamic>? ?? {};
         final penerimaan = data['penerimaan'] as Map<String, dynamic>? ?? {};
         final periode = data['periode'] as String? ?? 'Tidak Diketahui';
 
@@ -76,7 +84,8 @@ class NotificationsPage extends StatelessWidget {
         if ((hasilAnalisis['marginOfSafety'] as num? ?? 0) < 10) {
           notifications.add({
             'title': 'Margin of Safety Rendah',
-            'message': 'Margin of Safety pada periode $periode terlalu rendah! ($formattedTime)',
+            'message':
+                'Margin of Safety pada periode $periode terlalu rendah! ($formattedTime)',
             'source': 'Penetasan',
           });
         }
@@ -85,7 +94,8 @@ class NotificationsPage extends StatelessWidget {
         if ((penerimaan['persentaseMortalitas'] as num? ?? 0) > 50) {
           notifications.add({
             'title': 'Mortalitas Tinggi',
-            'message': 'Tingkat kematian itik sangat tinggi (${penerimaan['persentaseMortalitas']}%)! ($formattedTime)',
+            'message':
+                'Tingkat kematian itik sangat tinggi (${penerimaan['persentaseMortalitas']}%)! ($formattedTime)',
             'source': 'Penggemukan',
           });
         }
@@ -94,7 +104,8 @@ class NotificationsPage extends StatelessWidget {
         if ((hasilAnalisis['laba'] as num? ?? 0) < 0) {
           notifications.add({
             'title': 'Laba Negatif',
-            'message': 'Proses pada periode $periode mengalami kerugian! ($formattedTime)',
+            'message':
+                'Proses pada periode $periode mengalami kerugian! ($formattedTime)',
             'source': 'Layer',
           });
         }

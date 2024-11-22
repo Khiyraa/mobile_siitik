@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_siitik/screens/dashboard_screen.dart';
+import 'package:mobile_siitik/screens//dashboard_screen.dart';
 import 'package:mobile_siitik/screens/riwayat_screen.dart';
 import 'package:mobile_siitik/screens/notification_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../core/constants/app_colors.dart';
 import 'account_screen.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -14,12 +14,12 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 2; // Untuk melacak halaman yang aktif
+  int _currentIndex = 2;
 
   final List<Widget> _pages = [
     Center(child: Text('Link Ke Website')),
     RiwayatScreen(), // Halaman Riwayat
-    DashboardScreen(),// Halaman Akun
+    DashboardScreen(), // Halaman Akun
     NotificationsPage(),
     AccountScreen(),
     // Halaman Notifikasi
@@ -51,10 +51,12 @@ class _MainScreenState extends State<MainScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildNavItem('Website', Icons.language, () async {
-                  final Uri uri = Uri.parse('https://siitik-mbkm.research-ai.my.id/');
+                  final Uri uri =
+                      Uri.parse('https://siitik-mbkm.research-ai.my.id/');
 
                   try {
-                    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+                    if (!await launchUrl(uri,
+                        mode: LaunchMode.externalApplication)) {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -68,46 +70,37 @@ class _MainScreenState extends State<MainScreen> {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Pastikan Anda memiliki browser web yang terinstal'),
+                          content: Text(
+                              'Pastikan Anda memiliki browser web yang terinstal'),
                           duration: Duration(seconds: 2),
                         ),
                       );
                     }
                     print('Error: $e');
                   }
-                }),
+                }, 0),
                 _buildNavItem('Riwayat', Icons.history, () {
                   setState(() {
                     _currentIndex = 1; // Mengubah halaman aktif
                   });
-                  // Navigasi ke halaman RiwayatScreen
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => RiwayatScreen()),
-                  // );
-                }),
+                }, 1),
                 _buildNavItem('Logo Itik', Icons.pets, () {
                   setState(() {
                     _currentIndex = 2; // Mengubah halaman aktif
                   });
                   // Tambahkan aksi yang relevan untuk Logo Itik
-                }),
+                }, 2),
                 _buildNavItem('Notifikasi', Icons.notifications, () {
                   setState(() {
                     _currentIndex = 3; // Mengubah halaman aktif
                   });
                   // Tambahkan aksi untuk Notifikasi
-                }),
+                }, 3),
                 _buildNavItem('Akun', Icons.person, () {
                   setState(() {
                     _currentIndex = 4; // Mengubah halaman aktif
                   });
-                  // Tambahkan aksi untuk Akun
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => const AccountScreen()),
-                  // );
-                }),
+                }, 4),
               ],
             ),
           ),
@@ -116,13 +109,20 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  Widget _buildNavItem(String title, IconData icon, VoidCallback onTap) {
+  Widget _buildNavItem(
+      String title, IconData icon, VoidCallback onTap, int index) {
+    bool isSelected = _currentIndex == index;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        IconButton(
-          icon: Icon(icon, color: AppColors.primary),
-          onPressed: onTap,
+        CircleAvatar(
+          backgroundColor: isSelected ? AppColors.primary : Colors.transparent,
+          child: IconButton(
+            icon: Icon(icon,
+                color: isSelected ? Colors.white : AppColors.primary),
+            onPressed: onTap,
+          ),
         ),
         Text(title, style: const TextStyle(fontSize: 10)),
       ],

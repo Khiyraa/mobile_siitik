@@ -8,42 +8,6 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:272944052495:android:6aea813a553ea7160ca67a",
-        "android_client_info": {
-          "package_name": "com.polije.mbkmsiitik"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "272944052495-qlg2bf0mea75i1jds61j54u5i8nepg6l.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBifKc4O7oZu086z3kK_UQyFaoyinKykSA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "272944052495-qlg2bf0mea75i1jds61j54u5i8nepg6l.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "272944052495-6a753049pikct4oilmefuhksaoouhbo8.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.polije.mbkmsiitk.mobileSiitik"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:272944052495:android:aa2dedf93f3e7e540ca67a",
         "android_client_info": {
           "package_name": "com.polije.mbkmsiitk.mobile_siitik"

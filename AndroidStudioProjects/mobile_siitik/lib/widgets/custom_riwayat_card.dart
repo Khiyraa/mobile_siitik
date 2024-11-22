@@ -44,7 +44,7 @@ class CustomRiwayatCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8.0),
                   ...details.entries.map(
-                        (entry) => Text('${entry.key}: ${entry.value}'),
+                    (entry) => Text('${entry.key}: ${entry.value}'),
                   ),
                   const SizedBox(height: 8.0),
                   Align(

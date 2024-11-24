@@ -6,10 +6,10 @@ class AnalysisService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // Stream untuk mendapatkan data analisis periode
-  Stream<List<AnalysisData>> getAnalysisPeriodStream(String id_layer) {
+  Stream<List<AnalysisData>> getAnalysisPeriodStream(String idLayer) {
     return _firestore
         .collection('detail_penetasan')
-        .doc(id_layer)
+        .doc(idLayer)
         .collection('analisis_periode')
         .orderBy('created_at', descending: true)
         .limit(12) // Ambil 12 bulan terakhir

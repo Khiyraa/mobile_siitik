@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:mobile_siitik/firebase_options.dart';
 import 'package:mobile_siitik/screens/auth/login_screen.dart';
-import 'package:mobile_siitik/screens/dashboard_screen.dart';
 import 'package:mobile_siitik/screens/main_screen.dart';
 import 'package:mobile_siitik/screens/splashscreen.dart';
 

@@ -44,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       try {
         final userCredential =
-            await _authService.signInWithEmailAndPassword(email, password);
+        await _authService.signInWithEmailAndPassword(email, password);
         if (userCredential != null) {
           // Navigasi ke halaman dashboard setelah login berhasil
           Navigator.pushReplacementNamed(
@@ -79,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content:
-                  Text('Terjadi kesalahan: email atau password anda salah'),
+              Text('Terjadi kesalahan: email atau password anda salah'),
             ),
           );
         }
@@ -98,17 +98,13 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       print('Memulai proses login Google di LoginScreen');
-
-      // Logging sebelum mencoba login
-      print('Memulai signInWithGoogle...');
       final userCredential = await _authService.signInWithGoogle();
 
-      // Logging setelah userCredential diperoleh
-      if (userCredential != null && userCredential.user != null) {
+      if (userCredential.user != null) {
         print('Login berhasil: ${userCredential.user!.email}');
 
         if (!mounted) return;
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacementNamed(context, '/dashboard');
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -116,29 +112,22 @@ class _LoginScreenState extends State<LoginScreen> {
             backgroundColor: Colors.green,
           ),
         );
-      } else {
-        print('UserCredential kosong atau user null');
       }
     } catch (e) {
       print('Error detail dalam handleGoogleSignIn: $e');
-
-      // Logging tambahan untuk tipe error
-      if (e is FirebaseAuthException) {
-        print('Firebase Auth Error Code: ${e.code}');
-        print('Firebase Auth Error Message: ${e.message}');
-      } else {
-        print('Error bukan dari FirebaseAuthException: ${e.runtimeType}');
-      }
-
       String errorMessage = 'Gagal login dengan Google';
 
       if (e is FirebaseAuthException) {
+        print('Firebase Auth Error Code: ${e.code}');
+        print('Firebase Auth Error Message: ${e.message}');
+
         switch (e.code) {
           case 'user-cancelled':
             errorMessage = 'Login dibatalkan';
             break;
           case 'account-exists-with-different-credential':
-            errorMessage = 'Akun sudah terdaftar dengan metode login yang berbeda';
+            errorMessage =
+            'Akun sudah terdaftar dengan metode login yang berbeda';
             break;
           case 'invalid-credential':
             errorMessage = 'Kredensial tidak valid';
@@ -153,7 +142,8 @@ class _LoginScreenState extends State<LoginScreen> {
             errorMessage = 'Akun tidak ditemukan';
             break;
           default:
-            errorMessage = e.message ?? 'Terjadi kesalahan saat login dengan Google';
+            errorMessage =
+                e.message ?? 'Terjadi kesalahan saat login dengan Google';
         }
       }
 
@@ -170,11 +160,8 @@ class _LoginScreenState extends State<LoginScreen> {
           _isLoading = false;
         });
       }
-      // Logging setelah proses selesai, baik berhasil atau gagal
-      print('Proses login selesai');
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -199,7 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Image.asset(
                             AppImages.logo,
                             height:
-                                200, // Sesuaikan dengan ukuran yang diinginkan
+                            200, // Sesuaikan dengan ukuran yang diinginkan
                             fit: BoxFit.contain,
                           ),
                         ],

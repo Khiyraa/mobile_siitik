@@ -65,7 +65,7 @@ class FirebaseDataAccess {
       return data;
     } on FirebaseAuthException catch (e) {
       throw FirebaseException('Auth error: ${e.message}');
-    } on FirebaseException catch (e) {
+    } on FirebaseException {
       rethrow;
     } catch (e, stackTrace) {
       print('Stack trace: $stackTrace');

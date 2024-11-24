@@ -10,16 +10,16 @@ class DetailPeriodePage extends StatelessWidget {
   final String collectionName;
 
   const DetailPeriodePage({
-    Key? key,
+    super.key,
     required this.title,
     required this.collectionName,
-  }) : super(key: key);
+  });
 
   Future<List<Map<String, dynamic>>> getDetailPeriode() async {
-    final FirebaseAuth _auth = FirebaseAuth.instance;
-    final userId = _auth.currentUser?.email;
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final userId = auth.currentUser?.email;
     List<Map<String, dynamic>> details = [];
-    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     print(collectionName);
 
@@ -90,14 +90,14 @@ class DetailPeriodePage extends StatelessWidget {
       // }
       // }
 
-      QuerySnapshot mainDocs = await _firestore
+      QuerySnapshot mainDocs = await firestore
           .collection(collectionName)
           .where('userId', isEqualTo: userId)
           .orderBy('created_at', descending: true)
           .get();
 
       for (var mainDoc in mainDocs.docs) {
-        QuerySnapshot periodeDocs = await _firestore
+        QuerySnapshot periodeDocs = await firestore
             .collection(collectionName)
             .doc(mainDoc.id)
             .collection('analisis_periode')

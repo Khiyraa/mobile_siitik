@@ -7,7 +7,7 @@ import 'package:mobile_siitik/widgets/custom_riwayat_card.dart';
 import 'package:intl/intl.dart';
 
 class RiwayatScreen extends StatelessWidget {
-  RiwayatScreen({Key? key}) : super(key: key); // Tambahkan Key
+  RiwayatScreen({super.key}); // Tambahkan Key
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;

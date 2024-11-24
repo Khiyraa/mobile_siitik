@@ -16,7 +16,7 @@ import 'package:mobile_siitik/widgets/dashboard/sliding_chart_card.dart';
 import 'package:mobile_siitik/widgets/loading_indicator.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
+  const DashboardScreen({super.key});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -270,7 +270,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     Expanded(
                                       child: _buildSummaryCard(
                                         'Produksi Telur',
-                                        '${telurData.periodeIni.toStringAsFixed(0)}',
+                                        telurData.periodeIni.toStringAsFixed(0),
                                         'Telur/hari',
                                         Icons.egg_outlined,
                                         Colors.blue,

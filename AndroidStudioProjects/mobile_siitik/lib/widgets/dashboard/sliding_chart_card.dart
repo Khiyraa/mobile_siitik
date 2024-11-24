@@ -155,7 +155,7 @@ class _SlidingChartCardState extends State<SlidingChartCard> {
                   PieChartSectionData(
                     color: Colors.blue,
                     value: jantan > 0 ? jantan : 0.1, // Avoid 0 to keep the chart visible
-                    title: '${jantan.toStringAsFixed(1)}',
+                    title: jantan.toStringAsFixed(1),
                     radius: 70,
                     titleStyle: const TextStyle(
                       color: Colors.white,
@@ -165,7 +165,7 @@ class _SlidingChartCardState extends State<SlidingChartCard> {
                   PieChartSectionData(
                     color: Colors.pink,
                     value: betina > 0 ? betina : 0.1, // Avoid 0 to keep the chart visible
-                    title: '${betina.toStringAsFixed(1)}',
+                    title: betina.toStringAsFixed(1),
                     radius: 70,
                     titleStyle: const TextStyle(
                       color: Colors.white,

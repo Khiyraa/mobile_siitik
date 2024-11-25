@@ -25,59 +25,74 @@ class _RegisterDialogState extends State<RegisterDialog> {
     setState(() => _isLoading = true);
 
     try {
-      // Cek apakah email sudah terdaftar
-      final bool isEmailRegistered =
-          await _authService.isEmailRegistered(emailController.text.trim());
+      // Validasi email terlebih dahulu
+      final String email = emailController.text.trim();
+      final String password = passwordController.text.trim();
+      final String username = usernameController.text.trim();
 
-      if (isEmailRegistered) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Email sudah terdaftar!')),
-          );
-        }
+      final methods = await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
+      if (methods.isNotEmpty) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Email sudah terdaftar!'),
+            backgroundColor: Colors.red,
+          ),
+        );
         return;
       }
 
-      // Lakukan registrasi
-      await _authService.registerWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-        username: usernameController.text.trim(),
+      // Proses registrasi
+      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
       );
 
-      if (mounted) {
-        Navigator.of(context)
-            .pop(); // Close dialog after successful registration
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registrasi berhasil!')),
-        );
-      }
+      // Update profile
+      await userCredential.user?.updateDisplayName(username);
+
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Registrasi berhasil! Silakan login.'),
+          backgroundColor: Colors.green,
+        ),
+      );
     } on FirebaseAuthException catch (e) {
-      if (mounted) {
-        String errorMessage = 'Terjadi kesalahan saat registrasi';
-
-        switch (e.code) {
-          case 'weak-password':
-            errorMessage = 'Password terlalu lemah';
-            break;
-          case 'email-already-in-use':
-            errorMessage = 'Email sudah terdaftar';
-            break;
-          case 'invalid-email':
-            errorMessage = 'Format email tidak valid';
-            break;
-        }
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
+      String errorMessage;
+      switch (e.code) {
+        case 'weak-password':
+          errorMessage = 'Password minimal 6 karakter';
+          break;
+        case 'email-already-in-use':
+          errorMessage = 'Email sudah terdaftar';
+          break;
+        case 'invalid-email':
+          errorMessage = 'Format email tidak valid';
+          break;
+        case 'operation-not-allowed':
+          errorMessage = 'Registrasi dengan email dinonaktifkan';
+          break;
+        default:
+          errorMessage = 'Terjadi kesalahan: ${e.message}';
       }
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.red,
+        ),
+      );
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Terjadi kesalahan: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -89,68 +104,127 @@ class _RegisterDialogState extends State<RegisterDialog> {
     setState(() => _isLoading = true);
 
     try {
-      final googleUser = await GoogleSignIn(
-          scopes: ['email', 'profile'],
-          clientId: '272944052495-5979iuncr0ek5a198g7pdav572qm2tk0.apps.googleusercontent.com'
+      // Sign out dulu untuk memastikan dialog pemilihan akun muncul
+      await GoogleSignIn().signOut();
+
+      final GoogleSignInAccount? googleUser = await GoogleSignIn(
+        scopes: ['email', 'profile'],
       ).signIn();
 
-      if (googleUser == null) return;
+      if (googleUser == null) {
+        throw FirebaseAuthException(
+          code: 'user-cancelled',
+          message: 'Registrasi dibatalkan oleh user',
+        );
+      }
 
-      final googleAuth = await googleUser.authentication;
+      // Cek apakah email sudah terdaftar
+      final methods = await FirebaseAuth.instance.fetchSignInMethodsForEmail(googleUser.email);
+      if (methods.isNotEmpty) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Email sudah terdaftar! Silakan login.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
+      // Buat akun di Firebase
       final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
 
-      await _authService.registerWithEmailAndPassword(
-          email: userCredential.user!.email!,
-          password: 'google-${DateTime.now().millisecondsSinceEpoch}',
-          username: userCredential.user!.displayName ?? 'User'
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/home');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Registrasi dengan Google berhasil!'),
+          backgroundColor: Colors.green,
+        ),
       );
 
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/dashboard');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registrasi Google berhasil!')),
-        );
+    } on FirebaseAuthException catch (e) {
+      print('Firebase Auth Error: ${e.code} - ${e.message}');
+      String message;
+      switch (e.code) {
+        case 'user-cancelled':
+          message = 'Registrasi dibatalkan';
+          break;
+        case 'account-exists-with-different-credential':
+          message = 'Email sudah terdaftar dengan metode lain';
+          break;
+        case 'invalid-credential':
+          message = 'Kredensial tidak valid';
+          break;
+        case 'operation-not-allowed':
+          message = 'Registrasi dengan Google tidak diizinkan';
+          break;
+        case 'user-disabled':
+          message = 'Akun telah dinonaktifkan';
+          break;
+        default:
+          message = 'Terjadi kesalahan saat registrasi: ${e.message}';
       }
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.red,
+        ),
+      );
     } catch (e) {
-      print('Error: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal registrasi: ${e.toString()}')),
-        );
-      }
+      print('General Error: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Terjadi kesalahan: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   bool _validateInputs() {
-    if (emailController.text.isEmpty ||
-        passwordController.text.isEmpty ||
-        usernameController.text.isEmpty) {
+    if (emailController.text.trim().isEmpty ||
+        passwordController.text.trim().isEmpty ||
+        usernameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Semua field harus diisi')),
+        const SnackBar(
+          content: Text('Semua field harus diisi'),
+          backgroundColor: Colors.red,
+        ),
       );
       return false;
     }
 
-    // Validasi email
     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-        .hasMatch(emailController.text)) {
+        .hasMatch(emailController.text.trim())) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Format email tidak valid')),
+        const SnackBar(
+          content: Text('Format email tidak valid'),
+          backgroundColor: Colors.red,
+        ),
       );
       return false;
     }
 
-    // Validasi password (minimal 6 karakter)
-    if (passwordController.text.length < 6) {
+    if (passwordController.text.trim().length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password minimal 6 karakter')),
+        const SnackBar(
+          content: Text('Password minimal 6 karakter'),
+          backgroundColor: Colors.red,
+        ),
       );
       return false;
     }

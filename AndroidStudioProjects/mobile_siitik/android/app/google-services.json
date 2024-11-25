@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "272944052495-ih2gmtsimt7f0kubq95hvoupbm08uf0l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.polije.mbkmsiitk.mobile_siitik",
+            "certificate_hash": "627c9e2983475c0dad3b1123de8d174db3971b52"
+          }
+        },
+        {
           "client_id": "272944052495-qlg2bf0mea75i1jds61j54u5i8nepg6l.apps.googleusercontent.com",
           "client_type": 3
         }

@@ -18,6 +18,15 @@ class _SplashScreenState extends State<SplashScreen> {
     checkUser();
   }
 
+  Future<void> checkAuth() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      Navigator.pushReplacementNamed(context, '/home');
+    } else {
+      Navigator.pushReplacementNamed(context, '/login');
+    }
+  }
+
   void checkUser() {
     final User? user = FirebaseAuth.instance.currentUser;
     print("TESTING $user");

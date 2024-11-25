@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:mobile_siitik/firebase_options.dart';
 import 'package:mobile_siitik/screens/auth/login_screen.dart';
+import 'screens/auth/forgot_password_screen.dart';
 import 'package:mobile_siitik/screens/main_screen.dart';
 import 'package:mobile_siitik/screens/splashscreen.dart';
 
@@ -26,9 +27,8 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => SplashScreen(), // Route ke LoginScreen
         '/login': (context) => const LoginScreen(),
-        '/home': (context) =>
-            MainScreen(),
-        // '/forgot-password': (context) => const ForgotPasswordScreen(),
+        '/home': (context) => const MainScreen(),
+        '/forgot-password': (context) => const ForgotPasswordScreen(),
       },
     );
   }

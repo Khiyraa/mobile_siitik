@@ -25,45 +25,6 @@ class RiwayatScreen extends StatelessWidget {
     };
 
     try {
-      // Khusus untuk penggemukan yang tidak memiliki subcollection
-
-      // if (collectionName == 'detail_penggemukan') {
-      //   QuerySnapshot penggemukanDocs =
-      //       await _firestore.collection(collectionName).get();
-
-      //   if (penggemukanDocs.docs.isEmpty) return defaultValues;
-
-      //   double totalMos = 0;
-      //   double totalRc = 0;
-      //   double totalBepHarga = 0;
-      //   double totalBepHasil = 0;
-      //   double totalLaba = 0;
-      //   int count = 0;
-
-      //   for (var doc in penggemukanDocs.docs) {
-      //     var data = doc.data() as Map<String, dynamic>;
-      //     var analisis = data['hasilAnalisis'] as Map<String, dynamic>?;
-
-      //     if (analisis != null) {
-      //       totalMos += analisis['marginOfSafety'] ?? 0;
-      //       totalRc += analisis['rcRatio'] ?? 0;
-      //       totalBepHarga += analisis['bepHarga'] ?? 0;
-      //       totalBepHasil += analisis['bepHasil'] ?? 0;
-      //       totalLaba += analisis['laba'] ?? 0;
-      //       count++;
-      //     }
-      //   }
-
-      //   if (count == 0) return defaultValues;
-
-      //   return {
-      //     'marginOfSafety': totalMos / count,
-      //     'rcRatio': totalRc / count,
-      //     'bepHarga': totalBepHarga / count,
-      //     'bepHasil': totalBepHasil / count,
-      //     'laba': totalLaba / count,
-      //   };
-      // }
 
       // Untuk collection dengan subcollection (layer dan penetasan)
       QuerySnapshot mainDocs = await _firestore

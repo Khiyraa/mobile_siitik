@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mobile_siitik/core/constants/app_colors.dart';
 import 'package:mobile_siitik/core/constants/app_images.dart';
 import 'package:mobile_siitik/services/auth_service.dart';
@@ -25,6 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   bool _obscurePassword = true;
 
+
   void _showRegisterDialog() {
     // final emailController = TextEditingController();
     // final passwordController = TextEditingController();
@@ -44,11 +46,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
       try {
         final userCredential =
-        await _authService.signInWithEmailAndPassword(email, password);
+            await _authService.signInWithEmailAndPassword(email, password);
         if (userCredential != null) {
           // Navigasi ke halaman dashboard setelah login berhasil
           Navigator.pushReplacementNamed(
-              context, '/dashboard'); // '/home' akan membuka DashboardScreen
+              context, '/home'); // '/home' akan membuka DashboardScreen
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Login berhasil!'),
@@ -79,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content:
-              Text('Terjadi kesalahan: email atau password anda salah'),
+                  Text('Terjadi kesalahan: email atau password anda salah'),
             ),
           );
         }
@@ -91,74 +93,88 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _handleGoogleSignIn() async {
-    try {
-      setState(() {
-        _isLoading = true;
-      });
+  //Login dengan Google
+  Future<void> _handleGoogleSignUp() async {
+    setState(() => _isLoading = true);
 
-      print('Memulai proses login Google di LoginScreen');
-      final userCredential = await _authService.signInWithGoogle();
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        scopes: ['email', 'profile'],
+      );
+
+      // Sign out terlebih dahulu untuk memastikan dialog pemilihan akun muncul
+      await googleSignIn.signOut();
+
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      if (googleUser == null) {
+        throw FirebaseAuthException(
+          code: 'user-cancelled',
+          message: 'Login dibatalkan oleh user',
+        );
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Sign in ke Firebase
+      final userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
 
       if (userCredential.user != null) {
-        print('Login berhasil: ${userCredential.user!.email}');
-
         if (!mounted) return;
-        Navigator.pushReplacementNamed(context, '/dashboard');
 
+        // Update UI dengan info user
+        print('Logged in user: ${userCredential.user!.displayName}');
+
+        Navigator.pushReplacementNamed(context, '/home');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Login berhasil!'),
+            content: Text('Login dengan Google berhasil!'),
             backgroundColor: Colors.green,
           ),
         );
       }
-    } catch (e) {
-      print('Error detail dalam handleGoogleSignIn: $e');
-      String errorMessage = 'Gagal login dengan Google';
+    } on FirebaseAuthException catch (e) {
+      print('Firebase Auth Error: ${e.code} - ${e.message}');
+      String message = 'Terjadi kesalahan saat login dengan Google';
 
-      if (e is FirebaseAuthException) {
-        print('Firebase Auth Error Code: ${e.code}');
-        print('Firebase Auth Error Message: ${e.message}');
-
-        switch (e.code) {
-          case 'user-cancelled':
-            errorMessage = 'Login dibatalkan';
-            break;
-          case 'account-exists-with-different-credential':
-            errorMessage =
-            'Akun sudah terdaftar dengan metode login yang berbeda';
-            break;
-          case 'invalid-credential':
-            errorMessage = 'Kredensial tidak valid';
-            break;
-          case 'operation-not-allowed':
-            errorMessage = 'Login dengan Google tidak diaktifkan';
-            break;
-          case 'user-disabled':
-            errorMessage = 'Akun telah dinonaktifkan';
-            break;
-          case 'user-not-found':
-            errorMessage = 'Akun tidak ditemukan';
-            break;
-          default:
-            errorMessage =
-                e.message ?? 'Terjadi kesalahan saat login dengan Google';
-        }
+      switch (e.code) {
+        case 'user-cancelled':
+          message = 'Login dibatalkan';
+          break;
+        case 'account-exists-with-different-credential':
+          message = 'Email sudah terdaftar dengan metode login lain';
+          break;
+        case 'network-request-failed':
+          message = 'Periksa koneksi internet Anda';
+          break;
+        default:
+          message = e.message ?? 'Terjadi kesalahan saat login';
       }
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(errorMessage),
+          content: Text(message),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {
+      print('General Error: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Terjadi kesalahan. Silakan coba lagi.'),
           backgroundColor: Colors.red,
         ),
       );
     } finally {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
     }
   }
@@ -186,7 +202,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Image.asset(
                             AppImages.logo,
                             height:
-                            200, // Sesuaikan dengan ukuran yang diinginkan
+                                200, // Sesuaikan dengan ukuran yang diinginkan
                             fit: BoxFit.contain,
                           ),
                         ],
@@ -307,11 +323,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       // Tombol Google Sign In
                       InkWell(
-                        onTap: _handleGoogleSignIn,
+                        onTap: _handleGoogleSignUp,
+                        // Ganti _handleGoogleSignIn dengan _handleGoogleSignUp
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
+                            horizontal: 24, // Perbesar padding horizontal
+                            vertical: 12, // Perbesar padding vertical
                           ),
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.grey.shade300),
@@ -324,6 +341,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                 'assets/images/google.png',
                                 height: 24,
                                 width: 24,
+                              ),
+                              const SizedBox(width: 12), // Tambah jarak
+                              const Text(
+                                // Tambah text
+                                'Login dengan Google',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ],
                           ),

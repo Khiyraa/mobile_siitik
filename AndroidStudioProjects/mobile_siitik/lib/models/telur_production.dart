@@ -1,4 +1,3 @@
-// lib/models/telur_production.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TelurProduction {
@@ -20,12 +19,21 @@ class TelurProduction {
 
   factory TelurProduction.fromMap(Map<String, dynamic> map) {
     return TelurProduction(
-      jantan: (map['jumlahTelur'] as num).toInt(),
-      betina: (map['jumlahTelurMenetas'] as num).toInt(),
-      periodeIni: 219.toDouble(),
-      betinaSebelumnya: (map['betinaSebelumnya'] as num?)?.toDouble() ?? 0.0,
-      createdAt: (map['created_at'] as Timestamp).toDate(),
-      userId: map['userId'] as String,
+      // Tambahkan null check dan konversi yang aman
+      jantan: map['jumlahTelur'] != null
+          ? (map['jumlahTelur'] as num).toInt()
+          : 0,
+      betina: map['jumlahTelurMenetas'] != null
+          ? (map['jumlahTelurMenetas'] as num).toInt()
+          : 0,
+      periodeIni: 219.0, // Pastikan menggunakan .0 untuk double literal
+      betinaSebelumnya: map['betinaSebelumnya'] != null
+          ? (map['betinaSebelumnya'] as num).toDouble()
+          : 0.0,
+      createdAt: map['created_at'] != null
+          ? (map['created_at'] as Timestamp).toDate()
+          : DateTime.now(),
+      userId: map['userId'] as String? ?? '',
     );
   }
 
@@ -40,16 +48,13 @@ class TelurProduction {
     };
   }
 
-  // Helper method untuk mendapatkan total itik
   int get totalDucks => jantan + betina;
 
-  // Helper method untuk mendapatkan persentase produksi
-  double get productionPercentage => (periodeIni / totalDucks) * 100;
+  double get productionPercentage =>
+      totalDucks > 0 ? (periodeIni / totalDucks) * 100 : 0.0;
 
-  // Helper method untuk mendapatkan perubahan produksi
   double get productionChange {
-    // print(betinaSebelumnya);
-    if (betinaSebelumnya == 0) return 0;
+    if (betinaSebelumnya == 0) return 0.0;
     return ((periodeIni - betinaSebelumnya) / betinaSebelumnya) * 100;
   }
 }

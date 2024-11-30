@@ -206,11 +206,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: _currentDetailLayerId == null
             ? const Center(child: CircularProgressIndicator())
             : StreamBuilder<List<dynamic>>(
-                stream: _getCombinedStream(
-                  _currentDetailLayerId!,
-                  _currentDetailPenggemukanId!,
-                  _currentDetailPenetasanId!,
-                ),
+          stream: _getCombinedStream(
+            _currentDetailLayerId ?? '',
+            _currentDetailPenggemukanId ?? '',
+            _currentDetailPenetasanId ?? '',
+          ),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return Center(

@@ -1,479 +1,375 @@
-// lib/widgets/dashboard/sliding_chart_card.dart
 import 'package:flutter/material.dart';
+import 'package:mobile_siitik/models/analysis_data.dart';
+import 'package:mobile_siitik/models/telur_production.dart';
 import 'package:fl_chart/fl_chart.dart';
-import '../../models/analysis_data.dart';
-import '../../models/telur_production.dart';
-import '../../services/FirebaseDataAccess.dart';
+import 'package:intl/intl.dart';
 
 class SlidingChartCard extends StatefulWidget {
-  final TelurProduction telurData;
   final List<AnalysisData> analysisData;
+  final TelurProduction telurData;
 
   const SlidingChartCard({
-    super.key,
-    required this.telurData,
+    Key? key,
     required this.analysisData,
-  });
+    required this.telurData,
+  }) : super(key: key);
 
   @override
   State<SlidingChartCard> createState() => _SlidingChartCardState();
 }
 
 class _SlidingChartCardState extends State<SlidingChartCard> {
-  late PageController _pageController;
-  int _currentPage = 0;
-  double jantan = 0.0;
-  double betina = 0.0;
-  bool isLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController(initialPage: 0);
-    _fetchData();
-  }
-
-  Future<void> _fetchData() async {
-    try {
-      // Fetch jantan and betina data
-      final fatteningData = await FirebaseDataAccess().getFatteningData();
-      final analysisPeriodData = await FirebaseDataAccess().getAnalysisPeriodData();
-
-      setState(() {
-        jantan = fatteningData['penerimaan']['jumlahItikSetelahMortalitas'] ?? 0.0;
-        betina = analysisPeriodData['penerimaan']['jumlahItikAwal'] ?? 0.0;
-        isLoading = false; // Data loaded
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false; // Handle error loading data
-      });
-      print('Error fetching data: $e');
-    }
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
+  int _selectedIndex = 0; // 0: Keuangan, 1: Produksi
+  final currencyFormat = NumberFormat.currency(
+    locale: 'id_ID',
+    symbol: 'Rp ',
+    decimalDigits: 0,
+  );
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          height: 300,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 4,
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                _selectedIndex == 0 ? 'Analisis Keuangan' : 'Produksi Telur',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[800],
+                ),
               ),
+              _buildSegmentedControl(),
             ],
           ),
-          child: PageView(
-            controller: _pageController,
-            onPageChanged: (index) {
-              setState(() {
-                _currentPage = index;
-              });
-            },
-            children: [
-              _buildTelurkData(),
-              _buildFinancialData(),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        _buildPageIndicator(),
-      ],
+          const SizedBox(height: 24),
+          _selectedIndex == 0 ? _buildFinanceChart() : _buildProductionChart(),
+          const SizedBox(height: 24),
+          _selectedIndex == 0 ? _buildFinanceSummary() : _buildProductionSummary(),
+        ],
+      ),
     );
   }
 
-  Widget _buildTelurkData() {
-    return Column(
-      children: [
-        Expanded(
-          child: Row(
-            children: [
-              Expanded(child: _buildDistributionChart()),
-              Expanded(child: _buildProductionChart()),
-            ],
-          ),
-        ),
-        _buildDistributionLegend(),
-      ],
+  Widget _buildSegmentedControl() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildSegmentButton(0, 'Keuangan'),
+          _buildSegmentButton(1, 'Produksi'),
+        ],
+      ),
     );
   }
 
-  Widget _buildFinancialData() {
+  Widget _buildSegmentButton(int index, String label) {
+    final isSelected = _selectedIndex == index;
+    return GestureDetector(
+      onTap: () => setState(() => _selectedIndex = index),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.blue : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : Colors.grey[600],
+            fontSize: 12,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFinanceChart() {
     if (widget.analysisData.isEmpty) {
       return const Center(
-        child: Text('Belum ada data keuangan'),
+        child: Text('Belum ada data analisis keuangan'),
       );
     }
 
-    return Column(
-      children: [
-        Expanded(
-          child: Row(
-            children: [
-              Expanded(child: _buildRevenueAndCostChart()),
-              Expanded(child: _buildProfitChart()),
-            ],
-          ),
-        ),
-        _buildFinancialLegend(),
-      ],
-    );
-  }
-
-  Widget _buildDistributionChart() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          const Text(
-            'Distribusi Itik',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+    return SizedBox(
+      height: 200,
+      child: LineChart(
+        LineChartData(
+          gridData: FlGridData(show: false),
+          titlesData: FlTitlesData(
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 60,
+                getTitlesWidget: (value, meta) {
+                  return Text(
+                    currencyFormat.format(value).replaceAll('Rp ', ''),
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 10,
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator()) // Show loading indicator
-                : PieChart(
-              PieChartData(
-                sectionsSpace: 0,
-                centerSpaceRadius: 10,
-                sections: [
-                  PieChartSectionData(
-                    color: Colors.blue,
-                    value: jantan > 0 ? jantan : 0.1, // Avoid 0 to keep the chart visible
-                    title: jantan.toStringAsFixed(1),
-                    radius: 70,
-                    titleStyle: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+            rightTitles: AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            topTitles: AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  if (value.toInt() >= widget.analysisData.length) {
+                    return const Text('');
+                  }
+                  final date = widget.analysisData[value.toInt()].createdAt;
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      DateFormat('dd/MM').format(date),
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 10,
+                      ),
                     ),
-                  ),
-                  PieChartSectionData(
-                    color: Colors.pink,
-                    value: betina > 0 ? betina : 0.1, // Avoid 0 to keep the chart visible
-                    title: betina.toStringAsFixed(1),
-                    radius: 70,
-                    titleStyle: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+                  );
+                },
               ),
             ),
           ),
-        ],
+          borderData: FlBorderData(show: false),
+          lineBarsData: [
+            _createLineBarsData(Colors.green, (data) => data.revenue),
+            _createLineBarsData(Colors.red, (data) => data.cost),
+            _createLineBarsData(Colors.blue, (data) => data.profit),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildProductionChart() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
+    return SizedBox(
+      height: 200,
       child: Column(
-        children: [
-          const Text(
-            'Produksi Telur',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: BarChart(
-              BarChartData(
-                alignment: BarChartAlignment.spaceBetween, // Mengubah alignment agar lebih renggang
-                maxY: 100,
-                titlesData: FlTitlesData(
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget: (value, meta) {
-                        const style = TextStyle(fontSize: 12);
-                        String text;
-                        switch (value.toInt()) {
-                          case 0:
-                            text = 'Periode\nIni';
-                            break;
-                          case 1:
-                            text = 'Periode\nLalu';
-                            break;
-                          default:
-                            text = '';
-                        }
-                        return SideTitleWidget(
-                          axisSide: meta.axisSide,
-                          // space: 16, // Menambahkan ruang antara teks
-                          child: Text(text, style: style),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                borderData: FlBorderData(show: false),
-                gridData: const FlGridData(show: false),
-                barGroups: [
-                  BarChartGroupData(
-                    x: 0,
-                    barRods: [
-                      BarChartRodData(
-                        toY: widget.telurData.periodeIni.toDouble(),
-                        color: Colors.blue,
-                        width: 20, // Mengatur lebar bar agar lebih renggang
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(6),
-                        ),
-                      ),
-                    ],
-                  ),
-                  BarChartGroupData(
-                    x: 1,
-                    barRods: [
-                      BarChartRodData(
-                        toY: widget.telurData.betinaSebelumnya.toDouble(),
-                        color: Colors.orange,
-                        width: 20, // Mengatur lebar bar agar lebih renggang
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(6),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-
-  Widget _buildRevenueAndCostChart() {
-    final revenueSpots = widget.analysisData
-        .asMap()
-        .entries
-        .map((e) => FlSpot(e.key.toDouble(), e.value.revenue))
-        .toList();
-
-    final costSpots = widget.analysisData
-        .asMap()
-        .entries
-        .map((e) => FlSpot(e.key.toDouble(), e.value.cost))
-        .toList();
-
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          const Text(
-            'Pendapatan & Biaya',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: LineChart(
-              LineChartData(
-                gridData: const FlGridData(show: true),
-                titlesData: _buildFinancialTitles(),
-                borderData: FlBorderData(show: true),
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: revenueSpots,
-                    isCurved: true,
-                    color: Colors.green,
-                    barWidth: 3,
-                    dotData: const FlDotData(show: true),
-                  ),
-                  LineChartBarData(
-                    spots: costSpots,
-                    isCurved: true,
-                    color: Colors.red,
-                    barWidth: 3,
-                    dotData: const FlDotData(show: true),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProfitChart() {
-    final profitSpots = widget.analysisData
-        .asMap()
-        .entries
-        .map((e) => FlSpot(e.key.toDouble(), e.value.profit))
-        .toList();
-
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          const Text(
-            'Laba',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: LineChart(
-              LineChartData(
-                gridData: const FlGridData(show: true),
-                titlesData: _buildFinancialTitles(),
-                borderData: FlBorderData(show: true),
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: profitSpots,
-                    isCurved: true,
-                    color: Colors.blue,
-                    barWidth: 3,
-                    dotData: const FlDotData(show: true),
-                    belowBarData: BarAreaData(
-                      show: true,
-                      color: Colors.blue.withOpacity(0.1),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  FlTitlesData _buildFinancialTitles() {
-    return FlTitlesData(
-      leftTitles: AxisTitles(
-        sideTitles: SideTitles(
-          showTitles: true,
-          reservedSize: 40,
-          getTitlesWidget: (value, meta) {
-            return Text(
-              'Rp${(value / 1000000).toStringAsFixed(0)}M',
-              style: const TextStyle(fontSize: 10),
-            );
-          },
-        ),
-      ),
-      bottomTitles: AxisTitles(
-        sideTitles: SideTitles(
-          showTitles: true,
-          getTitlesWidget: (value, meta) {
-            if (value.toInt() >= widget.analysisData.length) {
-              return const Text('');
-            }
-            return Text(
-              _getMonthName(widget.analysisData[value.toInt()].createdAt),
-              style: const TextStyle(fontSize: 10),
-            );
-          },
-        ),
-      ),
-      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-    );
-  }
-
-  String _getMonthName(DateTime date) {
-    const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
-      'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'
-    ];
-    return months[date.month - 1];
-  }
-
-  Widget _buildDistributionLegend() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildLegendItem(Colors.blue, 'Jantan'),
-          const SizedBox(width: 24),
-          _buildLegendItem(Colors.pink, 'Betina'),
-          const SizedBox(width: 24),
-          _buildLegendItem(Colors.orange, 'Produksi'),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildProductionIndicator(
+                'Produksi Periode Ini',
+                widget.telurData.periodeIni,
+                Colors.blue,
+              ),
+              const SizedBox(width: 24),
+              _buildProductionIndicator(
+                'Produksi Sebelumnya',
+                widget.telurData.betinaSebelumnya,
+                Colors.grey,
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          _buildProgressIndicator(),
         ],
       ),
     );
   }
 
-  Widget _buildFinancialLegend() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _buildLegendItem(Colors.green, 'Pendapatan'),
-          const SizedBox(width: 24),
-          _buildLegendItem(Colors.red, 'Biaya'),
-          const SizedBox(width: 24),
-          _buildLegendItem(Colors.blue, 'Laba'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLegendItem(Color color, String label) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
+  Widget _buildProductionIndicator(String label, double value, Color color) {
+    return Column(
       children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
+        Text(
+          value.toStringAsFixed(1),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
             color: color,
-            shape: BoxShape.circle,
           ),
         ),
-        const SizedBox(width: 4),
+        const SizedBox(height: 4),
         Text(
           label,
-          style: const TextStyle(fontSize: 12),
+          style: const TextStyle(
+            fontSize: 12,
+            color: Colors.grey,
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildPageIndicator() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(
-        2, // Hanya 2 halaman: Telur Data dan Financial Data
-            (index) => Container(
-          width: 8,
-          height: 8,
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: _currentPage == index
-                ? Colors.blue
-                : Colors.grey.withOpacity(0.3),
+  Widget _buildProgressIndicator() {
+    return Column(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: LinearProgressIndicator(
+            value: widget.telurData.productionPercentage / 100,
+            backgroundColor: Colors.grey[200],
+            color: Colors.blue,
+            minHeight: 8,
           ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Persentase Produksi: ${widget.telurData.productionPercentage.toStringAsFixed(1)}%',
+          style: const TextStyle(
+            fontSize: 12,
+            color: Colors.grey,
+          ),
+        ),
+      ],
+    );
+  }
+
+  LineChartBarData _createLineBarsData(
+      Color color,
+      double Function(AnalysisData) getValue,
+      ) {
+    return LineChartBarData(
+      spots: widget.analysisData.asMap().entries.map((entry) {
+        return FlSpot(entry.key.toDouble(), getValue(entry.value));
+      }).toList(),
+      isCurved: true,
+      color: color,
+      barWidth: 2,
+      isStrokeCapRound: true,
+      dotData: FlDotData(show: false),
+      belowBarData: BarAreaData(show: false),
+    );
+  }
+
+  Widget _buildFinanceSummary() {
+    final latestData = widget.analysisData.isNotEmpty
+        ? widget.analysisData.last
+        : AnalysisData(revenue: 0, cost: 0);
+
+    return Row(
+      children: [
+        _buildSummaryCard(
+          'Pendapatan',
+          currencyFormat.format(latestData.revenue),
+          Colors.green,
+          Icons.trending_up,
+        ),
+        const SizedBox(width: 12),
+        _buildSummaryCard(
+          'Biaya',
+          currencyFormat.format(latestData.cost),
+          Colors.red,
+          Icons.trending_down,
+        ),
+        const SizedBox(width: 12),
+        _buildSummaryCard(
+          'Laba',
+          currencyFormat.format(latestData.profit),
+          Colors.blue,
+          Icons.account_balance,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProductionSummary() {
+    final change = widget.telurData.productionChange;
+    final changeColor = change >= 0 ? Colors.green : Colors.red;
+    final changeIcon = change >= 0 ? Icons.trending_up : Icons.trending_down;
+
+    return Row(
+      children: [
+        _buildSummaryCard(
+          'Total Itik',
+          '${widget.telurData.totalDucks}',
+          Colors.blue,
+          Icons.pets,
+        ),
+        const SizedBox(width: 12),
+        _buildSummaryCard(
+          'Produksi',
+          widget.telurData.periodeIni.toStringAsFixed(1),
+          Colors.orange,
+          Icons.egg_outlined,
+        ),
+        const SizedBox(width: 12),
+        _buildSummaryCard(
+          'Perubahan',
+          '${change.toStringAsFixed(1)}%',
+          changeColor,
+          changeIcon,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSummaryCard(
+      String title,
+      String value,
+      Color color,
+      IconData icon,
+      ) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: color, size: 16),
+                const SizedBox(width: 4),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: TextStyle(
+                color: Colors.grey[800],
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ),
       ),
     );

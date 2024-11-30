@@ -15,14 +15,14 @@ class NotificationsPage extends StatelessWidget {
       return []; // Jika pengguna belum login, kembalikan daftar kosong
     }
 
-    final currentUserId = user.uid; // Ambil UID pengguna
+    final currentUserEmail = user.email; // Ambil email pengguna yang login
     List<Map<String, dynamic>> allNotifications = [];
 
     try {
-      // Fetch Penetasan
+      // Ambil data Penetasan untuk pengguna saat ini
       final penetasanDocs = await firestore
           .collection('detail_penetasan')
-          .where('user_id', isEqualTo: currentUserId) // Filter berdasarkan UID pengguna
+          .where('userId', isEqualTo: currentUserEmail) // Filter berdasarkan email pengguna
           .orderBy('created_at', descending: true)
           .get();
 
@@ -50,10 +50,10 @@ class NotificationsPage extends StatelessWidget {
         }
       }
 
-      // Fetch Layer
+      // Ambil data Layer untuk pengguna saat ini
       final layerDocs = await firestore
           .collection('detail_layer')
-          .where('user_id', isEqualTo: currentUserId) // Filter berdasarkan UID pengguna
+          .where('userId', isEqualTo: currentUserEmail) // Filter berdasarkan email pengguna
           .orderBy('created_at', descending: true)
           .get();
 
@@ -81,10 +81,10 @@ class NotificationsPage extends StatelessWidget {
         }
       }
 
-      // Fetch Penggemukan
+      // Ambil data Penggemukan untuk pengguna saat ini
       final penggemukanDocs = await firestore
           .collection('detail_penggemukan')
-          .where('user_id', isEqualTo: currentUserId) // Filter berdasarkan UID pengguna
+          .where('userId', isEqualTo: currentUserEmail) // Filter berdasarkan email pengguna
           .orderBy('created_at', descending: true)
           .get();
 
@@ -104,7 +104,7 @@ class NotificationsPage extends StatelessWidget {
         });
       }
 
-      // Sort by timestamp
+      // Sortir berdasarkan waktu
       allNotifications.sort((a, b) {
         final aTime = a['created_at'] as Timestamp;
         final bTime = b['created_at'] as Timestamp;

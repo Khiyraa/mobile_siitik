@@ -9,10 +9,10 @@ class SlidingChartCard extends StatefulWidget {
   final TelurProduction telurData;
 
   const SlidingChartCard({
-    Key? key,
+    super.key,
     required this.analysisData,
     required this.telurData,
-  }) : super(key: key);
+  });
 
   @override
   State<SlidingChartCard> createState() => _SlidingChartCardState();

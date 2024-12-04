@@ -8,22 +8,26 @@ class NotificationsPage extends StatelessWidget {
   const NotificationsPage({Key? key}) : super(key: key);
 
   Future<List<Map<String, dynamic>>> _fetchAllAnalysisPeriods() async {
-    final _firestore = FirebaseFirestore.instance;
+    final firestore = FirebaseFirestore.instance;
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return [];
 
+    if (user == null) {
+      return []; // Jika pengguna belum login, kembalikan daftar kosong
+    }
+
+    final currentUserEmail = user.email; // Ambil email pengguna yang login
     List<Map<String, dynamic>> allNotifications = [];
 
     try {
-      // Fetch Penetasan
-      final penetasanDocs = await _firestore
+      // Ambil data Penetasan untuk pengguna saat ini
+      final penetasanDocs = await firestore
           .collection('detail_penetasan')
-          .where('userId', isEqualTo: user.uid)
+          .where('userId', isEqualTo: currentUserEmail) // Filter berdasarkan email pengguna
           .orderBy('created_at', descending: true)
           .get();
 
       for (var mainDoc in penetasanDocs.docs) {
-        final periodeDocs = await _firestore
+        final periodeDocs = await firestore
             .collection('detail_penetasan')
             .doc(mainDoc.id)
             .collection('analisis_periode')
@@ -31,23 +35,30 @@ class NotificationsPage extends StatelessWidget {
 
         for (var doc in periodeDocs.docs) {
           var data = doc.data();
+          final createdAt = data['created_at'];
+          if (createdAt == null || createdAt is! Timestamp) {
+            print("Skipping document with invalid or missing 'created_at': ${doc.id}");
+            continue; // Lewatkan dokumen ini jika 'created_at' tidak valid
+          }
           allNotifications.add({
             ...data,
             'type': 'penetasan',
             'id': doc.id,
+            'mainCollection': 'detail_penetasan',
+            'subCollection': 'analisis_periode',
           });
         }
       }
 
-      // Fetch Layer
-      final layerDocs = await _firestore
+      // Ambil data Layer untuk pengguna saat ini
+      final layerDocs = await firestore
           .collection('detail_layer')
-          .where('userId', isEqualTo: user.uid)
+          .where('userId', isEqualTo: currentUserEmail) // Filter berdasarkan email pengguna
           .orderBy('created_at', descending: true)
           .get();
 
       for (var mainDoc in layerDocs.docs) {
-        final periodeDocs = await _firestore
+        final periodeDocs = await firestore
             .collection('detail_layer')
             .doc(mainDoc.id)
             .collection('analisis_periode')
@@ -55,31 +66,45 @@ class NotificationsPage extends StatelessWidget {
 
         for (var doc in periodeDocs.docs) {
           var data = doc.data();
+          final createdAt = data['created_at'];
+          if (createdAt == null || createdAt is! Timestamp) {
+            print("Skipping document with invalid or missing 'created_at': ${doc.id}");
+            continue; // Lewatkan dokumen ini jika 'created_at' tidak valid
+          }
           allNotifications.add({
             ...data,
             'type': 'layer',
             'id': doc.id,
+            'mainCollection': 'detail_layer',
+            'subCollection': 'analisis_periode',
           });
         }
       }
 
-      // Fetch Penggemukan
-      final penggemukanDocs = await _firestore
+      // Ambil data Penggemukan untuk pengguna saat ini
+      final penggemukanDocs = await firestore
           .collection('detail_penggemukan')
-          .where('userId', isEqualTo: user.uid)
+          .where('userId', isEqualTo: currentUserEmail) // Filter berdasarkan email pengguna
           .orderBy('created_at', descending: true)
           .get();
 
       for (var doc in penggemukanDocs.docs) {
         var data = doc.data();
+        final createdAt = data['created_at'];
+        if (createdAt == null || createdAt is! Timestamp) {
+          print("Skipping document with invalid or missing 'created_at': ${doc.id}");
+          continue; // Lewatkan dokumen ini jika 'created_at' tidak valid
+        }
         allNotifications.add({
           ...data,
           'type': 'penggemukan',
           'id': doc.id,
+          'mainCollection': 'detail_penggemukan',
+          'subCollection': '',
         });
       }
 
-      // Sort by timestamp
+      // Sortir berdasarkan waktu
       allNotifications.sort((a, b) {
         final aTime = a['created_at'] as Timestamp;
         final bTime = b['created_at'] as Timestamp;

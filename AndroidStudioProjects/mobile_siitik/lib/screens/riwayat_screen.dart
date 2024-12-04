@@ -242,7 +242,7 @@ class RiwayatScreen extends StatelessWidget {
               _buildAnalysisCard(
                 context,
                 'Analisis Penggemukan',
-                Icons.pets,
+                Icons.dashboard_rounded,
                 calculateAverages('detail_penggemukan'),
                 'detail_penggemukan',
               ),

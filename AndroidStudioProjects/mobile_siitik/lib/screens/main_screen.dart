@@ -51,12 +51,10 @@ class _MainScreenState extends State<MainScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildNavItem('Website', Icons.language, () async {
-                  final Uri uri =
-                      Uri.parse('https://siitik-mbkm.research-ai.my.id/');
+                  final Uri uri = Uri.parse('https://siitik-mbkm.research-ai.my.id/');
 
                   try {
-                    if (!await launchUrl(uri,
-                        mode: LaunchMode.externalApplication)) {
+                    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -70,8 +68,7 @@ class _MainScreenState extends State<MainScreen> {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text(
-                              'Pastikan Anda memiliki browser web yang terinstal'),
+                          content: Text('Pastikan Anda memiliki browser web yang terinstal'),
                           duration: Duration(seconds: 2),
                         ),
                       );
@@ -84,7 +81,7 @@ class _MainScreenState extends State<MainScreen> {
                     _currentIndex = 1; // Mengubah halaman aktif
                   });
                 }, 1),
-                _buildNavItem('Logo Itik', Icons.pets, () {
+                _buildNavItemWithImage('Logo Itik', 'assets/images/logo2.png', () {
                   setState(() {
                     _currentIndex = 2; // Mengubah halaman aktif
                   });
@@ -109,8 +106,8 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  Widget _buildNavItem(
-      String title, IconData icon, VoidCallback onTap, int index) {
+// Fungsi untuk membangun item navigasi dengan ikon
+  Widget _buildNavItem(String title, IconData icon, VoidCallback onTap, int index) {
     bool isSelected = _currentIndex == index;
 
     return Column(
@@ -128,4 +125,34 @@ class _MainScreenState extends State<MainScreen> {
       ],
     );
   }
+
+// Fungsi untuk membangun item navigasi dengan gambar
+  Widget _buildNavItemWithImage(String title, String imagePath, VoidCallback onTap, int index) {
+    bool isSelected = _currentIndex == index;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CircleAvatar(
+          backgroundColor: isSelected ? AppColors.primary : Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            child: Container(
+              width: 32, // Sesuaikan ukuran gambar
+              height: 32,
+              child: Image.asset(
+                imagePath,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        ),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 10),
+        ),
+      ],
+    );
+  }
+
 }

@@ -16,7 +16,7 @@ import 'package:mobile_siitik/widgets/dashboard/sliding_chart_card.dart';
 import 'package:mobile_siitik/widgets/loading_indicator.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  const DashboardScreen({Key? key}) : super(key: key);
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -241,96 +241,112 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     );
                   }
 
-                  if (!snapshot.hasData) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    print('Memuat data...');
                     return const Center(
                       child: LoadingIndicator(
                         message: 'Memuat data...',
                       ),
                     );
+                  } else if (snapshot.hasError) {
+                    print('Terjadi kesalahan: ${snapshot.error}');
+                    return Center(
+                      child: Text('Terjadi kesalahan: ${snapshot.error}'),
+                    );
+                  } else if (!snapshot.hasData || snapshot.data == null) {
+                    print('Data tidak tersedia atau null');
+                    return const Center(
+                      child: Text('Data tidak tersedia'),
+                    );
+                  } else {
+                    // Jika data tersedia, lanjutkan pemrosesan
+                    print('Data berhasil dimuat');
+                    final telurData = snapshot.data![0] as TelurProduction;
+                    final analysisData = snapshot.data![1] as List<AnalysisData>;
+
+                    print('telurData: $telurData');
+                    print('analysisData: $analysisData');
+
+                    return RefreshIndicator(
+                      onRefresh: _refreshData,
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 20),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _buildSummaryCard(
+                                          'Produksi Telur',
+                                          '${telurData.periodeIni.toStringAsFixed(0)}',
+                                          'Telur/hari',
+                                          Icons.egg_outlined,
+                                          Colors.blue,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: _buildSummaryCard(
+                                          'Total Itik',
+                                          '${telurData.totalDucks}',
+                                          'Ekor',
+                                          Icons.pest_control,
+                                          Colors.green,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _buildSummaryCard(
+                                          'Persentase Produksi',
+                                          '${telurData.productionPercentage.toStringAsFixed(1)}%',
+                                          'Produktivitas',
+                                          Icons.show_chart,
+                                          Colors.orange,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: _buildSummaryCard(
+                                          'Perubahan',
+                                          '${telurData.productionChange.toStringAsFixed(1)}%',
+                                          'Dari periode sebelumnya',
+                                          Icons.trending_up,
+                                          telurData.productionChange >= 0
+                                              ? Colors.green
+                                              : Colors.red,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 24),
+                                  SlidingChartCard(
+                                    analysisData: analysisData,
+                                    telurData: telurData,
+                                  ),
+                                  const SizedBox(height: 24),
+                                  const InfoCard(),
+                                  const SizedBox(height: 24),
+                                  const MenuGrid(),
+                                  const SizedBox(height: 100),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
                   }
 
-                  final telurData = snapshot.data![0] as TelurProduction;
-                  final analysisData = snapshot.data![1] as List<AnalysisData>;
-
-                  // print("telurData ${analysisData}");
-                  return RefreshIndicator(
-                    onRefresh: _refreshData,
-                    child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(height: 20),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: _buildSummaryCard(
-                                        'Produksi Telur',
-                                        telurData.periodeIni.toStringAsFixed(0),
-                                        'Telur/hari',
-                                        Icons.egg_outlined,
-                                        Colors.blue,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: _buildSummaryCard(
-                                        'Total Itik',
-                                        '${telurData.totalDucks}',
-                                        'Ekor',
-                                        Icons.pest_control,
-                                        Colors.green,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 16),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: _buildSummaryCard(
-                                        'Persentase Produksi',
-                                        '${telurData.productionPercentage.toStringAsFixed(1)}%',
-                                        'Produktivitas',
-                                        Icons.show_chart,
-                                        Colors.orange,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: _buildSummaryCard(
-                                        'Perubahan',
-                                        '${telurData.productionChange.toStringAsFixed(1)}%',
-                                        'Dari periode sebelumnya',
-                                        Icons.trending_up,
-                                        telurData.productionChange >= 0
-                                            ? Colors.green
-                                            : Colors.red,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 24),
-                                SlidingChartCard(
-                                  analysisData: analysisData,
-                                  telurData: telurData,
-                                ),
-                                const SizedBox(height: 24),
-                                const InfoCard(),
-                                const SizedBox(height: 24),
-                                const MenuGrid(),
-                                const SizedBox(height: 100),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
                 },
               ),
       ),

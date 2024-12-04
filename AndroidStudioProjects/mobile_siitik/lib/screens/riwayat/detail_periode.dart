@@ -1,127 +1,71 @@
-// lib/screens/detail_periode_page.dart
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-import 'package:mobile_siitik/core//constants/app_colors.dart';
+import 'package:mobile_siitik/core/constants/app_colors.dart';
 
 class DetailPeriodePage extends StatelessWidget {
   final String title;
   final String collectionName;
 
   const DetailPeriodePage({
-    super.key,
+    Key? key,
     required this.title,
     required this.collectionName,
-  });
+  }) : super(key: key);
+
+  // Fungsi untuk memformat tanggal
+  String formatDate(Timestamp timestamp) {
+    // Mengonversi Timestamp ke DateTime
+    DateTime dateTime = timestamp.toDate();
+    return DateFormat('dd MMM yyyy').format(dateTime); // Format tanggal
+  }
 
   Future<List<Map<String, dynamic>>> getDetailPeriode() async {
-    final FirebaseAuth auth = FirebaseAuth.instance;
-    final userId = auth.currentUser?.email;
+    final FirebaseAuth _auth = FirebaseAuth.instance;
+    final userId = _auth.currentUser?.email;
     List<Map<String, dynamic>> details = [];
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-    print(collectionName);
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
     try {
-      // Untuk collection dengan subcollection (detail_penetasan dan detail_penetasan)
-      // if (collectionName == 'detail_penggemukan') {
-      //   // Menggunakan collectionGroup untuk mengambil semua dokumen dalam subcollection analisis_periode
-      //   QuerySnapshot periodeDocs = await _firestore
-      //       .collection('analisis_periode')
-      //       .orderBy('created_at', descending: true)
-      //       .get();
-
-      //   // print("periodeDocs.docs.length : ${periodeDocs.docs.length}");
-
-      //   for (var doc in periodeDocs.docs) {
-      //     // Dapatkan reference ke dokumen parent
-      //     DocumentReference parentRef = doc.reference.parent.parent!;
-
-      //     // Periksa apakah dokumen parent berasal dari collection yang kita inginkan
-      //     if (parentRef.parent.id == collectionName) {
-      //       var data = doc.data() as Map<String, dynamic>;
-      //       details.add({
-      //         'periode': data['periode'] ?? 'Tidak ada periode',
-      //         'data': data,
-      //         'id': doc.id,
-      //         'parentId': parentRef.id,
-      //       });
-      //     }
-      //   }
-      // } else {
-      // Untuk detail_penggemukan (tanpa subcollection)
-      // QuerySnapshot snapshot = await _firestore
-      //     .collection(collectionName)
-      //     .orderBy('created_at', descending: true)
-      //     .get();
-
-      // for (var doc in snapshot.docs) {
-      //   var data = doc.data() as Map<String, dynamic>;
-      //   details.add({
-      //     'periode': data['periode'] ?? 'Tidak ada periode',
-      //     'data': data,
-      //     'id': doc.id,
-      //   });
-      // }
-
-      // QuerySnapshot mainDocs = await _firestore
-      //     .collection(collectionName)
-      //     .where('userId', isEqualTo: userId)
-      //     .orderBy('created_at', descending: true)
-      //     .get();
-
-      // for (var mainDoc in mainDocs.docs) {
-      //   QuerySnapshot periodeDocs = await _firestore
-      //       .collection(collectionName)
-      //       .doc(mainDoc.id)
-      //       .collection('analisis_periode')
-      //       .get();
-
-      //   for (var doc in periodeDocs.docs) {
-      //     var data = doc.data() as Map<String, dynamic>;
-
-      //     details.add({
-      //       'periode': data['periode'] ?? 'Tidak ada periode',
-      //       'data': data,
-      //       'id': doc.id,
-      //     });
-      //   }
-      // }
-      // }
-
-      QuerySnapshot mainDocs = await firestore
+      QuerySnapshot mainDocs = await _firestore
           .collection(collectionName)
           .where('userId', isEqualTo: userId)
-          .orderBy('created_at', descending: true)
+          .orderBy('created_at', descending: true) // Pastikan 'created_at' ada dan berisi
           .get();
 
       for (var mainDoc in mainDocs.docs) {
-        QuerySnapshot periodeDocs = await firestore
+        QuerySnapshot periodeDocs = await _firestore
             .collection(collectionName)
             .doc(mainDoc.id)
             .collection('analisis_periode')
             .get();
 
+        // Group data by docId
+        List<Map<String, dynamic>> periodeList = [];
+
         for (var doc in periodeDocs.docs) {
           var data = doc.data() as Map<String, dynamic>;
 
-          details.add({
+          periodeList.add({
             'periode': data['periode'] ?? 'Tidak ada periode',
             'data': data,
             'id': doc.id,
           });
         }
+
+        // Sort berdasarkan periode dari terkecil ke terbesar
+        periodeList.sort((a, b) {
+          var periodeA = int.tryParse(a['periode'].toString()) ?? 0;
+          var periodeB = int.tryParse(b['periode'].toString()) ?? 0;
+          return periodeA.compareTo(periodeB); // ascending order
+        });
+
+        details.add({
+          'docId': mainDoc.id,
+          'periods': periodeList,
+        });
       }
-
-      // Sort berdasarkan periode jika diperlukan
-      details.sort((a, b) {
-        var periodeA = int.tryParse(a['periode'].toString()) ?? 0;
-        var periodeB = int.tryParse(b['periode'].toString()) ?? 0;
-        return periodeB.compareTo(periodeA); // descending order
-      });
-
-      print(details.length);
 
       return details;
     } catch (e) {
@@ -160,7 +104,7 @@ class DetailPeriodePage extends StatelessWidget {
       ),
       body: Container(
         color: AppColors.background,
-        child: FutureBuilder<List<Map<String, dynamic>>>(
+        child: FutureBuilder<List<Map<String, dynamic>>>( // FutureBuilder to load the data
           future: getDetailPeriode(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -181,166 +125,157 @@ class DetailPeriodePage extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               itemCount: details.length,
               itemBuilder: (context, index) {
-                final periodeData = details[index];
-                final data = periodeData['data'] as Map<String, dynamic>;
-                final hasilAnalisis =
-                    data['hasilAnalisis'] as Map<String, dynamic>;
-                final penerimaan = data['penerimaan'] as Map<String, dynamic>;
+                final docData = details[index];
+                final docId = docData['docId'];
+                final periodeList = docData['periods'] as List<Map<String, dynamic>>;
 
                 // Informasi umum yang ada di semua analisis
-                List<Widget> commonInfo = [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        ' ${periodeData['periode']}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        hasilAnalisis['rcRatio'] >= 1
-                            ? 'Efisien'
-                            : 'Tidak Efisien',
-                        style: TextStyle(
-                          color: hasilAnalisis['rcRatio'] >= 1
-                              ? Colors.green
-                              : Colors.red,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Divider(),
-                  _buildInfoRow('R/C Ratio',
-                      hasilAnalisis['rcRatio']?.toStringAsFixed(2) ?? 'N/A'),
-                  _buildInfoRow('Margin of Safety',
-                      '${hasilAnalisis['marginOfSafety']?.toStringAsFixed(2)}%'),
-                  _buildInfoRow('Laba',
-                      formatCurrency(hasilAnalisis['laba']?.toDouble() ?? 0)),
-                ];
+                List<Widget> commonInfo = [];
 
-                // Informasi spesifik berdasarkan jenis analisis
-                if (collectionName == 'detail_penetasan') {
-                  commonInfo.addAll([
-                    const Divider(),
-                    Text(
-                      'Informasi Penetasan',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[700],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    _buildInfoRow(
-                        'Jumlah Telur', '${penerimaan['jumlahTelur']} butir'),
-                    _buildInfoRow('Telur Menetas',
-                        '${penerimaan['jumlahTelurMenetas']} butir'),
-                    _buildInfoRow(
-                        'Jumlah DOD', '${penerimaan['jumlahDOD']} ekor'),
-                    _buildInfoRow('Persentase Penetasan',
-                        formatPersentase(penerimaan['persentase'])),
-                    _buildInfoRow(
-                        'Harga DOD',
-                        formatCurrency(
-                            penerimaan['hargaDOD']?.toDouble() ?? 0)),
-                  ]);
-                } else if (collectionName == 'detail_penggemukan') {
-                  final pengeluaran =
-                      data['pengeluaran'] as Map<String, dynamic>;
-                  commonInfo.addAll([
-                    const Divider(),
-                    Text(
-                      'Informasi Penggemukan',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[700],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    _buildInfoRow('Jumlah Itik Awal',
-                        '${penerimaan['jumlahItikAwal']} ekor'),
-                    _buildInfoRow('Jumlah Itik Setelah Mortalitas',
-                        '${penerimaan['jumlahItikSetelahMortalitas']} ekor'),
-                    _buildInfoRow('Persentase Mortalitas',
-                        '${penerimaan['persentaseMortalitas']?.toStringAsFixed(2)}%'),
-                    _buildInfoRow(
-                        'Harga per Itik',
-                        formatCurrency(
-                            penerimaan['hargaItik']?.toDouble() ?? 0)),
-                    const Divider(),
-                    Text(
-                      'Biaya Produksi',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[700],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    _buildInfoRow('Standar Pakan',
-                        '${pengeluaran['standardPakan']} gram'),
-                    _buildInfoRow(
-                        'Jumlah Pakan', '${pengeluaran['jumlahPakan']} kg'),
-                    _buildInfoRow(
-                        'Harga Pakan/kg',
-                        formatCurrency(
-                            pengeluaran['hargaPakan']?.toDouble() ?? 0)),
-                  ]);
-                }
+                for (var periodeData in periodeList) {
+                  final data = periodeData['data'] as Map<String, dynamic>;
+                  final hasilAnalisis = data['hasilAnalisis'] as Map<String, dynamic>;
+                  final penerimaan = data['penerimaan'] as Map<String, dynamic>;
 
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 8.0),
-                  child: InkWell(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  commonInfo.add(
+                    Card(
+                      margin: const EdgeInsets.only(bottom: 20), // Jarak antar analisis
+                      color: Colors.white,  // Memberikan warna putih pada card
+                      elevation: 15,  // Menambahkan shadow dan memperjelasnya
+                      shadowColor: Colors.black.withOpacity(0.8),  // Mengatur warna shadow agar lebih jelas
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0), // Membuat sudut card melengkung
+                      ),
+                      child: InkWell(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                '${periodeData['periode']}',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  // Menampilkan Periode dan Tanggal
+                                  Text(
+                                    'Periode: ${periodeData['periode']}',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  // Pastikan field created_at adalah Timestamp
+                                  Text(
+                                    'Tanggal: ${formatDate(data['created_at'])}', // Mengambil tanggal dari field created_at
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              Text(
-                                hasilAnalisis['rcRatio'] >= 1
-                                    ? 'Efisien'
-                                    : 'Tidak Efisien',
-                                style: TextStyle(
-                                  color: hasilAnalisis['rcRatio'] >= 1
-                                      ? Colors.green
-                                      : Colors.red,
-                                  fontWeight: FontWeight.bold,
+                              const Divider(),
+                              _buildInfoRow(
+                                  'R/C Ratio',
+                                  hasilAnalisis['rcRatio']?.toStringAsFixed(2) ?? 'N/A'),
+                              _buildInfoRow(
+                                  'Margin of Safety',
+                                  '${hasilAnalisis['marginOfSafety']?.toStringAsFixed(2)}%'),
+                              _buildInfoRow(
+                                  'Laba',
+                                  formatCurrency(hasilAnalisis['laba']?.toDouble() ?? 0)),
+                              _buildInfoRow(
+                                  'BEP Unit',
+                                  hasilAnalisis['bepHasil']?.toStringAsFixed(0) ?? 'N/A'),
+                              _buildInfoRow(
+                                  'BEP Harga',
+                                  formatCurrency(hasilAnalisis['bepHarga']?.toDouble() ?? 0)),
+
+                              // Menampilkan informasi spesifik berdasarkan collection
+                              if (collectionName == 'detail_penetasan') ...[
+                                const Divider(),
+                                Text(
+                                  'Informasi Penetasan',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey[700],
+                                  ),
                                 ),
-                              ),
+                                const SizedBox(height: 8),
+                                _buildInfoRow(
+                                    'Jumlah Telur', '${penerimaan['jumlahTelur']} butir'),
+                                _buildInfoRow(
+                                    'Telur Menetas', '${penerimaan['jumlahTelurMenetas']} butir'),
+                                _buildInfoRow(
+                                    'Jumlah DOD', '${penerimaan['jumlahDOD']} ekor'),
+                                _buildInfoRow(
+                                    'Persentase Penetasan',
+                                    formatPersentase(penerimaan['persentase'])),
+                                _buildInfoRow(
+                                    'Harga DOD',
+                                    formatCurrency(penerimaan['hargaDOD']?.toDouble() ?? 0)),
+                              ],
+
+                              if (collectionName == 'detail_penggemukan') ...[
+                                const Divider(),
+                                Text(
+                                  'Informasi Penggemukan',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey[700],
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                _buildInfoRow('Jumlah Itik Awal',
+                                    '${penerimaan['jumlahItikAwal']} ekor'),
+                                _buildInfoRow('Jumlah Itik Setelah Mortalitas',
+                                    '${penerimaan['jumlahItikSetelahMortalitas']} ekor'),
+                                _buildInfoRow('Persentase Mortalitas',
+                                    '${penerimaan['persentaseMortalitas']?.toStringAsFixed(2)}%'),
+                                _buildInfoRow('Harga per Itik',
+                                    formatCurrency(penerimaan['hargaItik']?.toDouble() ?? 0)),
+                                const Divider(),
+                                Text(
+                                  'Biaya Produksi',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey[700],
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                _buildInfoRow('Standar Pakan',
+                                    '${data['pengeluaran']['standardPakan']} gram'),
+                                _buildInfoRow(
+                                    'Jumlah Pakan', '${data['pengeluaran']['jumlahPakan']} kg'),
+                                _buildInfoRow(
+                                    'Harga Pakan/kg',
+                                    formatCurrency(
+                                        data['pengeluaran']['hargaPakan']?.toDouble() ?? 0)),
+                              ],
                             ],
                           ),
-                          const Divider(),
-                          _buildInfoRow(
-                              'R/C Ratio',
-                              hasilAnalisis['rcRatio']?.toStringAsFixed(2) ??
-                                  'N/A'),
-                          _buildInfoRow('Margin of Safety',
-                              '${hasilAnalisis['marginOfSafety']?.toStringAsFixed(2)}%'),
-                          _buildInfoRow(
-                              'Laba',
-                              formatCurrency(
-                                  hasilAnalisis['laba']?.toDouble() ?? 0)),
-                          if (collectionName == 'detail_penetasan')
-                            _buildInfoRow('Persentase Penetasan',
-                                formatPersentase(penerimaan['persentase'])),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
+                  );
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Dokumen ID: $docId', // Menampilkan ID dokumen
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Divider(),
+                    ...commonInfo,
+                    const SizedBox(height: 16.0),
+                  ],
                 );
               },
             );

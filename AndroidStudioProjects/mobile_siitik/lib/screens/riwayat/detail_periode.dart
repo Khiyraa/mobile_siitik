@@ -39,7 +39,11 @@ class DetailPeriodePage extends StatelessWidget {
             .collection(collectionName)
             .doc(mainDoc.id)
             .collection('analisis_periode')
+            .orderBy('periode')
+            .limit(10) // Contoh: Ambil hanya 10 dokumen pertama
             .get();
+
+
 
         // Group data by docId
         List<Map<String, dynamic>> periodeList = [];

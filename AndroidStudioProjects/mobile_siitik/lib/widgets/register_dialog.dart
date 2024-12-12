@@ -5,7 +5,7 @@ import 'package:mobile_siitik/core/constants/app_colors.dart';
 import 'package:mobile_siitik/services/auth_service.dart';
 
 class RegisterDialog extends StatefulWidget {
-  const RegisterDialog({Key? key}) : super(key: key);
+  const RegisterDialog({super.key});
 
   @override
   State<RegisterDialog> createState() => _RegisterDialogState();

@@ -8,12 +8,12 @@ class CustomRiwayatCard extends StatelessWidget {
   final Map<String, String> details;
 
   const CustomRiwayatCard({
-    Key? key,
+    super.key,
     required this.icon,
     required this.title,
     required this.time,
     required this.details,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

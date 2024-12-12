@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_siitik/models/analysis_data.dart';
 import 'package:mobile_siitik/models/telur_production.dart';
+import 'package:mobile_siitik/services/layer_data_service.dart';
 import 'package:mobile_siitik/widgets/dashboard/average_periode_card.dart';
+import 'package:mobile_siitik/services/layer_data_service.dart';
+import 'package:mobile_siitik/services/penggemukan_data_service.dart';
 
 class SlidingChartCard extends StatefulWidget {
   final List<AnalysisData> analysisData;
   final TelurProduction telurData;
 
   const SlidingChartCard({
-    Key? key,
+    super.key,
     required this.analysisData,
     required this.telurData,
-  }) : super(key: key);
+  });
 
   @override
   State<SlidingChartCard> createState() => _SlidingChartCardState();
@@ -61,26 +64,67 @@ class _SlidingChartCardState extends State<SlidingChartCard> {
   }
 
   Widget _buildAverageSection() {
-    return AveragePeriodSection(
-      penetasanData: widget.analysisData
-          .where((data) {
-        var penerimaan = data.penerimaan;
-        return penerimaan != null && (penerimaan['jumlahDOD'] as num?) != null;
-      })
-          .map((data) => data.toMap())
-          .toList(),
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      // Panggil method untuk mengambil data layer
+      future: LayerDataService.fetchLayerData(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();  // Tampilkan indikator loading
+        }
 
-      // Layer: Ambil data dari TelurProduction
-      layerData: [widget.telurData.toAverageData()],
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');  // Tampilkan error jika terjadi masalah
+        }
 
-      // Penggemukan: Filter data berdasarkan jumlah itik setelah mortalitas
-      penggemukanData: widget.analysisData
-          .where((data) {
-        var penerimaan = data.penerimaan;
-        return penerimaan != null && (penerimaan['jumlahItikSetelahMortalitas'] as num?) != null;
-      })
-          .map((data) => data.toMap())
-          .toList(),
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Text('No data available');  // Tampilkan pesan jika tidak ada data
+        }
+
+        var layerData = snapshot.data!;
+
+        return FutureBuilder<List<Map<String, dynamic>>>(
+          future: PenggemukanDataService.fetchPenggemukanData(),  // Panggil method untuk mengambil data penggemukan
+          builder: (context, penggemukanSnapshot) {
+            if (penggemukanSnapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();  // Tampilkan indikator loading
+            }
+
+            if (penggemukanSnapshot.hasError) {
+              return Text('Error: ${penggemukanSnapshot.error}');  // Tampilkan error jika terjadi masalah
+            }
+
+            if (!penggemukanSnapshot.hasData || penggemukanSnapshot.data!.isEmpty) {
+              return Text('No penggemukan data available');  // Tampilkan pesan jika tidak ada data
+            }
+
+            var penggemukanData = penggemukanSnapshot.data!;
+
+            return AveragePeriodSection(
+              penetasanData: widget.analysisData
+                  .where((data) {
+                var penerimaan = data.penerimaan;
+                return penerimaan != null && (penerimaan['jumlahDOD'] as num?) != null;
+              })
+                  .map((data) => data.toMap())
+                  .toList(),
+
+              // Layer: Ambil data dari layerData
+              layerData: layerData.map((data) => {
+                'penerimaan': data['penerimaan'],
+                'pengeluaran': data['pengeluaran'],
+                'hasilAnalisis': data['hasilAnalisis'],
+              }).toList(),
+
+              // Penggemukan: Ambil data dari penggemukanData
+              penggemukanData: penggemukanData.map((data) => {
+                'penerimaan': data['penerimaan'],
+                'pengeluaran': data['pengeluaran'],
+                'hasilAnalisis': data['hasilAnalisis'],
+              }).toList(),
+            );
+          },
+        );
+      },
     );
   }
 }

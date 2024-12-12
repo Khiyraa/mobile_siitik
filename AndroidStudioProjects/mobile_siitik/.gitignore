@@ -43,7 +43,7 @@ app.*.map.json
 /android/app/release
 
 # Firebase configuration
-firebase_options.dart
+lib/firebase_options.dart
 
 AppData/Local/
 # Contoh pattern lainnya

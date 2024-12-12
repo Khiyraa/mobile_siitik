@@ -5,7 +5,7 @@ import 'package:mobile_siitik/core/constants/app_colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class NotificationsPage extends StatelessWidget {
-  const NotificationsPage({Key? key}) : super(key: key);
+  const NotificationsPage({super.key});
 
   Future<List<Map<String, dynamic>>> _fetchAllAnalysisPeriods() async {
     final firestore = FirebaseFirestore.instance;
@@ -117,6 +117,7 @@ class NotificationsPage extends StatelessWidget {
       return [];
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

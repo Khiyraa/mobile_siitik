@@ -6,7 +6,7 @@ import 'package:mobile_siitik/screens//akun/edit_profile.dart';
 import 'package:mobile_siitik/screens//akun/help_screen.dart';
 
 class AccountScreen extends StatelessWidget {
-  const AccountScreen({Key? key}) : super(key: key);
+  const AccountScreen({super.key});
 
   Future<void> _signOut(BuildContext context) async {
     try {

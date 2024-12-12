@@ -39,7 +39,11 @@ class DetailPeriodePage extends StatelessWidget {
             .collection(collectionName)
             .doc(mainDoc.id)
             .collection('analisis_periode')
+            .orderBy('periode')
+            .limit(10) // Contoh: Ambil hanya 10 dokumen pertama
             .get();
+
+
 
         // Group data by docId
         List<Map<String, dynamic>> periodeList = [];
@@ -183,6 +187,12 @@ class DetailPeriodePage extends StatelessWidget {
                               _buildInfoRow(
                                   'Laba',
                                   formatCurrency(hasilAnalisis['laba']?.toDouble() ?? 0)),
+                              _buildInfoRow(
+                                  'BEP Unit',
+                                  hasilAnalisis['bepHasil']?.toStringAsFixed(0) ?? 'N/A'),
+                              _buildInfoRow(
+                                  'BEP Harga',
+                                  formatCurrency(hasilAnalisis['bepHarga']?.toDouble() ?? 0)),
 
                               // Menampilkan informasi spesifik berdasarkan collection
                               if (collectionName == 'detail_penetasan') ...[

@@ -29,7 +29,9 @@ class TelurProduction {
       betina: map['jumlahTelurMenetas'] != null
           ? (map['jumlahTelurMenetas'] as num).toInt()
           : 0,
-      periodeIni: 219.0,  // Sesuaikan jika diperlukan
+      periodeIni: map['periodeIni'] != null
+          ? (map['periodeIni'] as num).toDouble()
+          : 219.0,  // Sesuaikan jika diperlukan
       betinaSebelumnya: map['betinaSebelumnya'] != null
           ? (map['betinaSebelumnya'] as num).toDouble()
           : 0.0,
@@ -69,17 +71,31 @@ class TelurProduction {
           // Ambil data periode dari dokumen pertama di analisis_periode
           DocumentSnapshot periodeDoc = periodeSnapshot.docs.first;
 
-          // Debugging: print seluruh data dari periodeDoc untuk verifikasi
-          print('Data dokumen periode: ${periodeDoc.data()}');
-
+          // Mengambil data dari periode, sesuaikan dengan struktur yang ada
           var data = periodeDoc.data() as Map<String, dynamic>;
 
-          // Debugging output untuk memverifikasi apakah 'penerimaan' dan 'pengeluaran' ada
-          print('Penerimaan di Firestore: ${data['penerimaan']}');
-          print('Pengeluaran di Firestore: ${data['pengeluaran']}');
+          // Membaca data dari 'penerimaan', 'pengeluaran', dan 'hasilAnalisis' sesuai struktur
+          Map<String, dynamic> penerimaan = data['penerimaan'] ?? {};
+          Map<String, dynamic> pengeluaran = data['pengeluaran'] ?? {};
+          Map<String, dynamic> hasilAnalisis = data['hasilAnalisis'] ?? {};
 
-          // Kembalikan data yang telah dipetakan ke dalam model TelurProduction
-          return TelurProduction.fromMap(data);
+          // Debugging output untuk memverifikasi apakah 'penerimaan' dan 'pengeluaran' ada
+          print('Penerimaan di Firestore: $penerimaan');
+          print('Pengeluaran di Firestore: $pengeluaran');
+          print('Hasil Analisis di Firestore: $hasilAnalisis');
+
+          // Menyusun data untuk TelurProduction
+          return TelurProduction.fromMap({
+            'jumlahTelur': data['jumlahTelur'] ?? 0,
+            'jumlahTelurMenetas': data['jumlahTelurMenetas'] ?? 0,
+            'betinaSebelumnya': data['betinaSebelumnya'] ?? 0,
+            'created_at': data['created_at'] ?? Timestamp.now(),
+            'userId': data['userId'] ?? '',
+            'penerimaan': penerimaan,
+            'pengeluaran': pengeluaran,
+            // Data dari hasil analisis jika ada
+            'hasilAnalisis': hasilAnalisis,
+          });
         } else {
           print('Dokumen periodeId terbaru tidak ditemukan');
           return null;
@@ -97,10 +113,10 @@ class TelurProduction {
 
   Map<String, dynamic> toMap() {
     return {
-      'jumlahTelur': jantan,
-      'jumlahTelurMenetas': betina,
-      'periodeIni': periodeIni,
-      'betinaSebelumnya': betinaSebelumnya,
+      // 'jumlahTelur': jantan,
+      // 'jumlahTelurMenetas': betina,
+      // 'periodeIni': periodeIni,
+      // 'betinaSebelumnya': betinaSebelumnya,
       'created_at': Timestamp.fromDate(createdAt),
       'userId': userId,
       'penerimaan': penerimaan,

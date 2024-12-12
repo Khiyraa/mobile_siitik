@@ -26,8 +26,9 @@ class AveragePeriodCard extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isSmallScreen = constraints.maxWidth < 360;
-        final defaultPadding = isSmallScreen ? 10.0 : 12.0;
+        // Menggunakan MediaQuery untuk mendapatkan lebar layar
+        final isSmallScreen = MediaQuery.of(context).size.width < 360;
+        final defaultPadding = isSmallScreen ? 0.0 : 0.0;
 
         return Container(
           width: double.infinity,
@@ -47,20 +48,29 @@ class AveragePeriodCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Icon(icon, color: cardColor, size: isSmallScreen ? 20 : 24),
-                  SizedBox(width: 8),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: isSmallScreen ? 14 : 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[800],
+                  Icon(
+                    icon,
+                    color: cardColor,
+                    size: isSmallScreen ? 20 : 24,
+                  ),
+                  SizedBox(width: isSmallScreen ? 6 : 8),
+                  Flexible(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 14 : 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[800],
+                      ),
+                      overflow: TextOverflow.ellipsis, // Mencegah overflow teks
+                      maxLines: 1, // Batasi ke satu baris
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: isSmallScreen ? 12 : 16),
+              SizedBox(height: isSmallScreen ? 10 : 16),
               Wrap(
                 spacing: isSmallScreen ? 8 : 12,
                 runSpacing: isSmallScreen ? 8 : 12,
@@ -79,6 +89,7 @@ class AveragePeriodCard extends StatelessWidget {
         );
       },
     );
+
   }
 
   Widget _buildAverageItem(
@@ -90,7 +101,8 @@ class AveragePeriodCard extends StatelessWidget {
       ) {
     bool isCurrency = label.toLowerCase().contains('biaya') ||
         label.toLowerCase().contains('revenue') ||
-        label.toLowerCase().contains('pendapatan');
+        label.toLowerCase().contains('pendapatan') ||
+        label.toLowerCase().contains('laba');
 
     return Container(
       width: isSmallScreen ? 95 : 110,
@@ -109,8 +121,8 @@ class AveragePeriodCard extends StatelessWidget {
               fontSize: isSmallScreen ? 10 : 12,
               fontWeight: FontWeight.w500,
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
+            softWrap: true, // Mengizinkan pembungkusan teks
+            overflow: TextOverflow.visible, // Teks tidak akan dipotong
           ),
           SizedBox(height: isSmallScreen ? 4 : 6),
           Text(
@@ -120,8 +132,8 @@ class AveragePeriodCard extends StatelessWidget {
               fontSize: isSmallScreen ? 12 : 14,
               fontWeight: FontWeight.bold,
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+            softWrap: true, // Mengizinkan pembungkusan teks
+            overflow: TextOverflow.visible, // Teks tidak akan dipotong
           ),
         ],
       ),
@@ -187,12 +199,12 @@ class AveragePeriodSection extends StatelessWidget {
       print('Pendapatan: ${analisisData.revenue}');
       print('Biaya: ${analisisData.cost}');
       print('Profit: ${analisisData.profit}');
-      print('Persentase Bertelur: ${analisisData.penerimaan?['persentaseBertelur']}');
+      print('Persentase Bertelur: ${analisisData.penerimaan?['persentase']}');
 
       totalPendapatan += analisisData.revenue;
       totalBiaya += analisisData.cost;
       totalProfit += analisisData.profit;
-      totalPersentaseBertelur += analisisData.penerimaan?['persentaseBertelur'] ?? 0.0;
+      totalPersentaseBertelur += analisisData.penerimaan?['persentase'] ?? 0.0;
     }
 
     int jumlahData = layerData.length;

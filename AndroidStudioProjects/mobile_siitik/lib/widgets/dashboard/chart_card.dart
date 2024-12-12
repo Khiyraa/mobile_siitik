@@ -9,10 +9,10 @@ class ChartCard extends StatelessWidget {
   final TelurProduction telurData;
 
   const ChartCard({
-    Key? key,
+    super.key,
     required this.analysisData,
     required this.telurData,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

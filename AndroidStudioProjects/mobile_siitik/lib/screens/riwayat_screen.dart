@@ -157,7 +157,7 @@ class RiwayatScreen extends StatelessWidget {
               'MOS': formatPercentage(averages['marginOfSafety']!),
               'R/C Ratio': averages['rcRatio']!.toStringAsFixed(2),
               'BEP Harga': formatCurrency(averages['bepHarga']!),
-              'BEP Hasil': averages['bepHasil']!.toStringAsFixed(2),
+              'BEP Unit': averages['bepHasil']!.toStringAsFixed(2),
               'Laba': formatCurrency(averages['laba']!),
             },
           ),
